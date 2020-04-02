@@ -1,0 +1,144 @@
+CHECKPOINT 1:
+//Source Code//
+#include <stdio.h>
+
+int main() {
+  printf("Success!\nYou've just completed the first task.\n");
+  return 0;
+}
+
+//CLI Output//
+student@student64:~/cnlabs/labwork/workshop01$ gcc -o hello hello.c
+student@student64:~/cnlabs/labwork/workshop01$ ./hello
+Success!
+You've just completed the first task.
+
+
+
+CHECKPOINT 2:
+//Source Code//
+#include <stdio.h>
+
+int main(int argc, const char *argv[]) {
+
+    if(argc > 1){
+        printf("Hello, %s. Welcome to CN. \n",argv[1]);
+    }
+    return 0;
+}
+
+//CLI Output//
+student@student64:~/cnlabs/labwork/workshop01$ gcc cnhello.c -o cnhello -std=c99 -Wall
+student@student64:~/cnlabs/labwork/workshop01$ ./cnhello Joel
+Hello, Joel. Welcome to CN. 
+
+
+
+CHECKPOINT 3:
+//Source Code//
+hello: hello.c
+	gcc hello.c -o hello -std=c99 -Wall
+
+cnhello: cnhello.c
+	gcc cnhello.c -o cnhello -std=c99 -Wall
+
+//CLI Output//
+student@student64:~/cnlabs/labwork/workshop01$ make cnhello
+gcc cnhello.c -o cnhello -std=c99 -Wall
+student@student64:~/cnlabs/labwork/workshop01$ ls
+circle.c  cnhello  cnhello.c  cnhello.old  hello  hello.c  makefile  triangle.c  workshop01.txt
+
+
+
+CHECKPOINT 4:
+//Source Code//
+#include <stdio.h>
+
+int main(int argc, const char *argv[]) {
+
+    for(int i = 0; i < 5; ++i){
+        for(int j = 0;j<=i;++j){
+            printf("*");
+        }
+        putchar('\n');
+    }
+    return 0;
+}
+
+
+//Makefile//
+hello: hello.c
+	gcc hello.c -o hello -std=c99 -Wall
+
+cnhello: cnhello.c
+	gcc cnhello.c -o cnhello -std=c99 -Wall
+
+triangle: triangle.c
+	gcc triangle.c -o triangle -std=c99 -Wall
+
+
+//CLI Output//
+student@student64:~/cnlabs/labwork/workshop01$ make triangle
+gcc triangle.c -o triangle -std=c99 -Wall
+student@student64:~/cnlabs/labwork/workshop01$ ./triangle
+*
+**
+***
+****
+*****
+
+
+
+CHECKPOINT 5:
+//Source Code//
+#include <stdio.h>
+
+#define PI 3.141592
+
+double area(double radius);
+double circumference(double radius);
+
+int main(int argc, const char *argv[]) {
+    printf("Enter a radius in metres: ");
+    double radius = 0.0;
+    const int result = scanf("%lf", &radius);
+
+    // True if the user's value was assigned to radius
+    if (result > 0) {
+        printf("Area: %.2lfm\n", area(radius));
+        printf("Circumference: %.2lfm\n", circumference(radius));
+    }
+    
+    return 0;
+}
+
+double area(double radius) {
+    return PI * radius * radius;
+}
+
+double circumference(double radius){
+    return 2 * PI * radius;
+}
+
+
+//Makefile//
+hello: hello.c
+	gcc hello.c -o hello -std=c99 -Wall
+
+cnhello: cnhello.c
+	gcc cnhello.c -o cnhello -std=c99 -Wall
+
+triangle: triangle.c
+	gcc triangle.c -o triangle -std=c99 -Wall
+
+circle: circle.c
+	gcc circle.c -o circle -std=c99 -Wall
+
+
+//CLI Output//
+student@student64:~/cnlabs/labwork/workshop01$ make circle
+gcc circle.c -o circle -std=c99 -Wall
+student@student64:~/cnlabs/labwork/workshop01$ ./circle
+Enter a radius in metres: 4
+Area: 50.27m
+Circumference: 25.13m
