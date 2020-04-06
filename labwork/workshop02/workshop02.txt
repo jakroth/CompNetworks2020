@@ -1,0 +1,111 @@
+CHECKPOINT 1:
+******* Source Code *******
+#include <stdio.h>
+
+int main(int argc, char * argv[]){
+    
+    int ch;
+    
+    while((ch = getchar()) != EOF){
+        putchar(ch);
+    }
+}
+
+******* CLI Output *******
+student@student64:~/CompNetworks2020/labwork/workshop02$ gcc task1.c -o task1 -std=c99 -Wall
+student@student64:~/CompNetworks2020/labwork/workshop02$ ./task1
+The quick brown fox
+The quick brown fox
+student@student64:~/CompNetworks2020/labwork/workshop02$ ./task1 < OperatingSystem.txt 
+An operating system is a layer of sophisticated software that manages hardware resources and provides a common interface for user programs. Popular desktop operating systems include:
+- Windows
+- macOS
+- Linux
+
+
+
+CHECKPOINT 2:
+******* Source Code *******
+#include <stdio.h>
+
+int main(int argc, char * argv[]){
+    
+    int ch;
+    
+    while((ch = getchar()) != EOF){
+        putchar(ch);
+    }
+}
+
+******* CLI Output *******
+student@student64:~/CompNetworks2020/labwork/workshop02$ gcc task1.c -o task1 -std=c99 -Wall
+student@student64:~/CompNetworks2020/labwork/workshop02$ ./task1
+The quick brown fox
+The quick brown fox
+
+
+
+CHECKPOINT 3:
+******* Source Code *******
+#include <stdio.h>
+
+int main(int argc, char * argv[]){
+    
+    int ch;
+    
+    while((ch = getchar()) != EOF){
+        putchar(ch);
+    }
+}
+
+******* CLI Output *******
+student@student64:~/CompNetworks2020/labwork/workshop02$ gcc task1.c -o task1 -std=c99 -Wall
+student@student64:~/CompNetworks2020/labwork/workshop02$ ./task1
+The quick brown fox
+The quick brown fox
+
+
+
+CHECKPOINT 4:
+******* Source Code *******
+#include <stdio.h>
+
+int main(int argc, char * argv[]){
+    
+    int ch;
+    
+    while((ch = getchar()) != EOF){
+        putchar(ch);
+    }
+}
+
+******* CLI Output *******
+student@student64:~/CompNetworks2020/labwork/workshop02$ gcc task1.c -o task1 -std=c99 -Wall
+student@student64:~/CompNetworks2020/labwork/workshop02$ ./task1
+The quick brown fox
+The quick brown fox
+
+
+
+CHECKPOINT 5:
+******* Source Code *******
+#include <stdio.h>
+
+int main(int argc, char * argv[]){
+    
+    int ch;
+    
+    while((ch = getchar()) != EOF){
+        putchar(ch);
+    }
+}
+
+******* Makefile *******
+
+
+******* CLI Output *******
+student@student64:~/CompNetworks2020/labwork/workshop02$ gcc task1.c -o task1 -std=c99 -Wall
+student@student64:~/CompNetworks2020/labwork/workshop02$ ./task1
+The quick brown fox
+The quick brown fox
+
