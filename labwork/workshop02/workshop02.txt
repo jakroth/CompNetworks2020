@@ -1,18 +1,30 @@
+WORKSHOP 2
+Name: Joel Pillar-Rogers
+FAN: pill0032
+Date: 6/4/2020
+
+
 CHECKPOINT 1:
 ******* Source Code *******
 #include <stdio.h>
 
 int main(int argc, char * argv[]){
     
-    int ch;
+    int ch = 0;
     
     while((ch = getchar()) != EOF){
         putchar(ch);
     }
 }
 
+******* Makefile *******
+task1: task1.c
+	gcc task1.c -o task1 -std=c99 -Wall
+
+
 ******* CLI Output *******
-student@student64:~/CompNetworks2020/labwork/workshop02$ gcc task1.c -o task1 -std=c99 -Wall
+student@student64:~/CompNetworks2020/labwork/workshop02$ make task1
+gcc task1.c -o task1 -std=c99 -Wall
 student@student64:~/CompNetworks2020/labwork/workshop02$ ./task1
 The quick brown fox
 The quick brown fox
@@ -27,63 +39,205 @@ An operating system is a layer of sophisticated software that manages hardware r
 CHECKPOINT 2:
 ******* Source Code *******
 #include <stdio.h>
+#include <unistd.h> 
 
 int main(int argc, char * argv[]){
-    
-    int ch;
+
+    int ch = 0;
     
     while((ch = getchar()) != EOF){
+        if(ch == ' '){
+            fflush(stdout);
+            usleep(200000);
+        }
         putchar(ch);
     }
 }
 
+******* Makefile *******
+task1: task1.c
+	gcc task1.c -o task1 -std=c99 -Wall
+
+task2: task2.c
+	gcc task2.c -o task2 -std=c99 -Wall
+
+
 ******* CLI Output *******
-student@student64:~/CompNetworks2020/labwork/workshop02$ gcc task1.c -o task1 -std=c99 -Wall
-student@student64:~/CompNetworks2020/labwork/workshop02$ ./task1
-The quick brown fox
-The quick brown fox
+student@student64:~/CompNetworks2020/labwork/workshop02$ make test2
+gcc task2.c -o task2 -std=c99 -Wall
+student@student64:~/CompNetworks2020/labwork/workshop02$ ./task2 < OperatingSystem.txt 
+An operating system is a layer of sophisticated software that manages hardware resources and provides a common interface for user programs. Popular desktop operating systems include:
+- Windows
+- macOS
+- Linux
 
 
 
 CHECKPOINT 3:
 ******* Source Code *******
 #include <stdio.h>
+#include <unistd.h> 
+#include <ctype.h>
 
 int main(int argc, char * argv[]){
-    
-    int ch;
+
+    int ch = 0;
     
     while((ch = getchar()) != EOF){
-        putchar(ch);
+        if(ch == ' '){
+            fflush(stdout);
+            usleep(200000);
+            putchar('\n');
+        }
+        if(isalpha(ch)){
+            putchar(ch);
+        }
     }
+    putchar('\n');
+    return 0;
 }
 
+******* Makefile *******
+task1: task1.c
+	gcc task1.c -o task1 -std=c99 -Wall
+
+task2: task2.c
+	gcc task2.c -o task2 -std=c99 -Wall
+
+task3: task3.c
+	gcc task3.c -o task3 -std=c99 -Wall
+
+
 ******* CLI Output *******
-student@student64:~/CompNetworks2020/labwork/workshop02$ gcc task1.c -o task1 -std=c99 -Wall
-student@student64:~/CompNetworks2020/labwork/workshop02$ ./task1
-The quick brown fox
-The quick brown fox
+student@student64:~/CompNetworks2020/labwork/workshop02$ make test3
+gcc task3.c -o task3 -std=c99 -Wall
+student@student64:~/CompNetworks2020/labwork/workshop02$ ./task3 < OperatingSystem.txt 
+An
+operating
+system
+is
+a
+layer
+of
+sophisticated
+software
+that
+manages
+hardware
+resources
+and
+provides
+a
+common
+interface
+for
+user
+programs
+Popular
+desktop
+operating
+systems
+include
+Windows
+macOS
+Linux
+student@student64:~/CompNetworks2020/labwork/workshop02$ ./task3 < OperatingSystem.txt > Words.txt
+student@student64:~/CompNetworks2020/labwork/workshop02$ cat Words.txt
+An
+operating
+system
+is
+a
+layer
+of
+sophisticated
+software
+that
+manages
+hardware
+resources
+and
+provides
+a
+common
+interface
+for
+user
+programs
+Popular
+desktop
+operating
+systems
+include
+Windows
+macOS
+Linux
 
 
 
 CHECKPOINT 4:
 ******* Source Code *******
 #include <stdio.h>
+#include <unistd.h> 
+#include <ctype.h>
+#include <string.h>
 
 int main(int argc, char * argv[]){
-    
-    int ch;
+
+    int ch = 0;
+    int lines = 0;
+    int characters = 0;
+    int words = 0;
+    int upperChars = 0;
+    int lowerChars = 0;
+    int vowels = 0;
     
     while((ch = getchar()) != EOF){
-        putchar(ch);
+        characters++;
+        if(ch == '\n') lines++;
+        if(isspace(ch)) words++;
+        if(isupper(ch)) upperChars++;
+        if(islower(ch)) lowerChars++;
+        if(strchr("aeiouAEIOU", ch) != NULL) vowels++;
     }
+
+    printf("%3d lines \n", lines);
+    printf("%3d words \n", words);
+    printf("%3d characters \n", characters);
+    printf("%3d vowels \n", vowels);
+    printf("%3d lowercase \n", lowerChars);
+    printf("%3d uppercase \n", upperChars);
+
+    return 0;
 }
 
+******* Makefile *******
+task1: task1.c
+	gcc task1.c -o task1 -std=c99 -Wall
+
+task2: task2.c
+	gcc task2.c -o task2 -std=c99 -Wall
+
+task3: task3.c
+	gcc task3.c -o task3 -std=c99 -Wall
+
+task4: task4.c
+	gcc task4.c -o task4 -std=c99 -Wall
+
+
 ******* CLI Output *******
-student@student64:~/CompNetworks2020/labwork/workshop02$ gcc task1.c -o task1 -std=c99 -Wall
-student@student64:~/CompNetworks2020/labwork/workshop02$ ./task1
-The quick brown fox
-The quick brown fox
+student@student64:~/CompNetworks2020/labwork/workshop02$ make task4
+gcc task4.c -o task4 -std=c99 -Wall
+student@student64:~/CompNetworks2020/labwork/workshop02$ ./task4 < OperatingSystem.txt 
+  4 lines 
+ 32 words 
+209 characters 
+ 65 vowels 
+166 lowercase 
+  6 uppercase 
+student@student64:~/CompNetworks2020/labwork/workshop02$ wc OperatingSystem.txt 
+  4  32 209 OperatingSystem.txt
+
 
 
 
@@ -91,21 +245,87 @@ CHECKPOINT 5:
 ******* Source Code *******
 #include <stdio.h>
 
+static const int max_word_length = 50;
+void copy(char src[], char dst[], int count);
+void copy2(char src[], char dst[], int count);
+void copy3(char src[], char dst[], int count);
+
 int main(int argc, char * argv[]){
+
+    int c = 0;
+    int i = 0;
+    char curr_word[max_word_length];
+    char longest_word[max_word_length];
+    int longest = 0;
+    int char_count = 0;
     
-    int ch;
-    
-    while((ch = getchar()) != EOF){
-        putchar(ch);
+    while((c = getc(stdin)) != EOF && i < max_word_length-1){
+        curr_word[char_count] = c;
+        if(c == '\n'){
+            curr_word[char_count] = '\0';
+            if(char_count > longest){
+                copy(curr_word,longest_word,char_count);
+                longest = char_count;
+            }
+            char_count = 0;
+        }
+        else{
+            char_count++;
+        }
+    }
+    printf("Longest word: %s\n", longest_word);
+    printf("Length: %d\n", longest);
+    return 0;
+}
+
+//copy function using pointer syntax, increment operators and implicit while not(\0) condition
+void copy(char src[], char dst[], int count){
+    while(*src){
+        *dst++ = *src++;
+        count--;
+        if(count==0) return;
+    }
+}
+
+//copy function using for loop, array syntax and returning on explicit if(\0) test
+void copy2(char src[], char dst[], int count){    
+    for(int i = 0; i < count; i++){
+        dst[i] = src[i];
+        if(src[i] == '\0') return;
+    }
+}
+
+//copy function using while loop, array syntax and explicit while not(\0) condition
+void copy3(char src[], char dst[], int count){    
+    int i = 0;
+    while(src[i] != '\0' && i < count){
+        dst[i] = src[i];
+        i++;
     }
 }
 
 ******* Makefile *******
+task1: task1.c
+	gcc task1.c -o task1 -std=c99 -Wall
+
+task2: task2.c
+	gcc task2.c -o task2 -std=c99 -Wall
+
+task3: task3.c
+	gcc task3.c -o task3 -std=c99 -Wall
+
+task4: task4.c
+	gcc task4.c -o task4 -std=c99 -Wall
+
+task5: task5.c
+	gcc task5.c -o task5 -std=c99 -Wall
 
 
 ******* CLI Output *******
-student@student64:~/CompNetworks2020/labwork/workshop02$ gcc task1.c -o task1 -std=c99 -Wall
-student@student64:~/CompNetworks2020/labwork/workshop02$ ./task1
-The quick brown fox
-The quick brown fox
+student@student64:~/CompNetworks2020/labwork/workshop02$ make task5
+gcc task5.c -o task5 -std=c99 -Wall
+student@student64:~/CompNetworks2020/labwork/workshop02$ ./task5 < Words.txt
+Longest word: sophisticated
+Length: 13
+
 

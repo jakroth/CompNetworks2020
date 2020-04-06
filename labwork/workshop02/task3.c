@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h> 
+#include <ctype.h>
 
 int main(int argc, char * argv[]){
 
@@ -9,7 +10,12 @@ int main(int argc, char * argv[]){
         if(ch == ' '){
             fflush(stdout);
             usleep(200000);
+            putchar('\n');
         }
-        putchar(ch);
+        if(isalpha(ch)){
+            putchar(ch);
+        }
     }
+    putchar('\n');
+    return 0;
 }
