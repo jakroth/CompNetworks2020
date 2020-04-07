@@ -1,0 +1,115 @@
+WORKSHOP 3                        ENGR9881 - Computer Networks
+Name: Joel Pillar-Rogers
+FAN: pill0032
+Date: 7/4/2020
+
+******* Makefile *******
+task1: task1.c
+	gcc task1.c -o task1 -std=c99 -Wall
+
+
+CHECKPOINT 1:
+******* Source Code *******
+int main(int argc, char * argv[]){
+
+    printf("The number of bits in a byte: %d\n", CHAR_BIT);
+    printf("size of char:     %lu byte(s) (%lu bits)\n", sizeof(char), sizeof(char)*CHAR_BIT);
+    printf("size of short:    %lu byte(s) (%lu bits)\n", sizeof(short), sizeof(short)*CHAR_BIT);
+    printf("size of int:      %lu byte(s) (%lu bits)\n", sizeof(int), sizeof(int)*CHAR_BIT);
+    printf("size of long:     %lu byte(s) (%lu bits)\n", sizeof(long), sizeof(long)*CHAR_BIT);
+    printf("size of float:    %lu byte(s) (%lu bits)\n", sizeof(float), sizeof(float)*CHAR_BIT);
+    printf("size of double:   %lu byte(s) (%lu bits)\n", sizeof(double), sizeof(double)*CHAR_BIT);
+    printf("size of char *:   %lu byte(s) (%lu bits)\n", sizeof(char *), sizeof(char *)*CHAR_BIT);    
+    printf("size of int *:    %lu byte(s) (%lu bits)\n", sizeof(int *), sizeof(int *)*CHAR_BIT);      
+    printf("size of double *: %lu byte(s) (%lu bits)\n", sizeof(double *), sizeof(double *)*CHAR_BIT);       
+    printf("\n");
+
+    double darr[7];
+    char flo [] = "Flinders University Online";
+    printf("size of double darr[7]: %lu byte(s) (%lu bits)\n", sizeof(darr), sizeof(darr)*CHAR_BIT);
+    printf("size of \"Flinders University Online\": %lu byte(s) (%lu bits)\n", sizeof(flo), sizeof(flo)*CHAR_BIT); 
+    printf("\n");
+
+    printf("length of double darr[7]: %lu\n", sizeof(darr)/sizeof(double));
+    printf("length of \"Flinders University Online\": %lu (including the \'\\0\' character the end)\n", sizeof(flo)/sizeof(char));
+
+    return 0; 
+}
+
+// The pointers are all the same size, at 64bits. This is because I am on a 64-bit system (I have the 64-bit VM installed). 
+
+// The size of double darr[7] will be 7 * 8 bytes = 56 bytes (448 bits).
+// The size of "Flinders University Online" is the same as char str[27], because declared inside "" it includes '\0' at the end.
+// So it will be 27 * 1 byte = 27 bytes (216 bits).
+
+// You could determine the length of an array by using sizeof(arr)/sizeof(type), where type is the type of element in the array.
+
+
+******* CLI Output *******
+student@student64:~/CompNetworks2020/labwork/workshop03$ make task1
+gcc task1.c -o task1 -std=c99 -Wall
+student@student64:~/CompNetworks2020/labwork/workshop03$ ./task1
+The number of bits in a byte: 8
+size of char:     1 byte(s) (8 bits)
+size of short:    2 byte(s) (16 bits)
+size of int:      4 byte(s) (32 bits)
+size of long:     8 byte(s) (64 bits)
+size of float:    4 byte(s) (32 bits)
+size of double:   8 byte(s) (64 bits)
+size of char *:   8 byte(s) (64 bits)
+size of int *:    8 byte(s) (64 bits)
+size of double *: 8 byte(s) (64 bits)
+
+size of double darr[7]: 56 byte(s) (448 bits)
+size of "Flinders University Online": 27 byte(s) (216 bits)
+
+length of double darr[7]: 7
+length of "Flinders University Online": 27 (including the '\0' character the end)
+
+
+
+CHECKPOINT 2:
+******* Source Code *******
+
+
+
+
+
+******* CLI Output *******
+
+
+CHECKPOINT 3:
+******* Source Code *******
+
+
+******* Makefile *******
+
+
+******* CLI Output *******
+
+
+
+CHECKPOINT 4:
+******* Source Code *******
+
+
+******* Makefile *******
+
+
+******* CLI Output *******
+
+
+
+
+CHECKPOINT 5:
+******* Source Code *******
+
+
+
+******* Makefile *******
+
+
+
+******* CLI Output *******
+
+

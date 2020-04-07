@@ -1,0 +1,7 @@
+Deadlock occurs when all of the following apply:
+1. Mutual exclusion condition
+2. Hold and wait condition
+3. No pre-emption condition
+4. Circular wait condition
+
+Lecture5.pdf (2018)
