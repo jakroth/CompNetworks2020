@@ -405,10 +405,62 @@ student@student64:~/CompNetworks2020/labwork/workshop03$ ./task4b
 
 
 CHECKPOINT 5:
-******* Source Code *******
+******* Source Code - task5.c*******
+#include "ctap.h"
+#include "reverse.h"
 
+TESTS {
+const char *t = "Tonsley";
+char *r = reverse(t);
+
+//test 1
+ok(string_length(t) == string_length(r), "Strings are the same size");
+
+//test 2
+is("yelsnoT",r,"Strings match");
+}
+
+******* Source Code - reverse.h*******
+#ifndef REVERSE_H
+#define REVERSE_H
+
+int string_length(const char *str);
+
+char *reverse(const char *str);
+
+#endif
+
+******* Source Code - reverse.c*******
+#include <stdlib.h>
+#include "reverse.h"
+
+int string_length(const char *str){
+    int i = 0;
+    while(str[i]) i++;
+    return i;
+}
+
+char *reverse(const char *str){
+    int len = string_length(str);
+    char * new_str = (char *)malloc(len * sizeof(char));
+    for(int i = 0; i < len; i++){
+        *(new_str+i) = *(str+len-i-1);
+    }
+    return new_str;
+}
 
 
 ******* CLI Output *******
+student@student64:~/CompNetworks2020/labwork/workshop03$ make clean5
+rm task5 task5.o reverse.o
+student@student64:~/CompNetworks2020/labwork/workshop03$ make task5
+gcc -c -o reverse.o reverse.c -Wall
+gcc -c -o task5.o task5.c -Wall
+gcc -o task5 task5.o reverse.o -Wall
+student@student64:~/CompNetworks2020/labwork/workshop03$ make test5
+./task5
+ok 1 - Strings are the same size
+ok 2 - Strings match
+1..2
 
 

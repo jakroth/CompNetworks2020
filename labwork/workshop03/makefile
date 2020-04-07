@@ -19,20 +19,18 @@ task4a: task4a.c
 task4b: task4b.c
 	gcc task4b.c -o task4b -std=c99 -Wall
 
-task4b: task4b.c
-	gcc task4b.c -o task4b -std=c99 -Wall
-
-test5: clean make5
+test5: task5
+	./task5
 
 clean5:
 	rm task5 task5.o reverse.o
 
-task5:	task5.o
-	gcc -o task5 task5.o -std=c99 -Wall
+task5: reverse.o task5.o 
+	gcc -o task5 task5.o reverse.o -Wall
 
-task5.o:	task5.c ctap.h reverse.h
-	gcc -c -o task5.o task5.c -std=c99 -Wall
+task5.o: task5.c ctap.h reverse.h
+	gcc -c -o task5.o task5.c -Wall
 
 reverse.o: reverse.c reverse.h
-	gcc -c -o reverse.o reverse.c -std=c99 -Wall
+	gcc -c -o reverse.o reverse.c -Wall
 
