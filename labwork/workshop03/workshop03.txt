@@ -3,6 +3,7 @@ Name: Joel Pillar-Rogers
 FAN: pill0032
 Date: 7/4/2020
 
+
 ******* Makefile *******
 task1: task1.c
 	gcc task1.c -o task1 -std=c99 -Wall
@@ -18,6 +19,28 @@ task3a: task3a.c
 
 task3b: task3b.c
 	gcc task3b.c -o task3b -std=c99 -Wall
+
+task4a: task4a.c
+	gcc task4a.c -o task4a -std=c99 -Wall
+
+task4b: task4b.c
+	gcc task4b.c -o task4b -std=c99 -Wall
+
+test5: task5
+	./task5
+
+clean5:
+	rm task5 task5.o reverse.o
+
+task5: reverse.o task5.o 
+	gcc -o task5 task5.o reverse.o -Wall
+
+task5.o: task5.c ctap.h reverse.h
+	gcc -c -o task5.o task5.c -Wall
+
+reverse.o: reverse.c reverse.h
+	gcc -c -o reverse.o reverse.c -Wall
+
 
 
 CHECKPOINT 1:
@@ -405,21 +428,6 @@ student@student64:~/CompNetworks2020/labwork/workshop03$ ./task4b
 
 
 CHECKPOINT 5:
-******* Source Code - task5.c*******
-#include "ctap.h"
-#include "reverse.h"
-
-TESTS {
-const char *t = "Tonsley";
-char *r = reverse(t);
-
-//test 1
-ok(string_length(t) == string_length(r), "Strings are the same size");
-
-//test 2
-is("yelsnoT",r,"Strings match");
-}
-
 ******* Source Code - reverse.h*******
 #ifndef REVERSE_H
 #define REVERSE_H
@@ -429,6 +437,7 @@ int string_length(const char *str);
 char *reverse(const char *str);
 
 #endif
+
 
 ******* Source Code - reverse.c*******
 #include <stdlib.h>
@@ -447,6 +456,24 @@ char *reverse(const char *str){
         *(new_str+i) = *(str+len-i-1);
     }
     return new_str;
+}
+
+
+******* Source Code - task5.c*******
+#include "ctap.h"
+#include "reverse.h"
+
+TESTS {
+const char *t = "Tonsley";
+char *r = reverse(t);
+
+//test 1
+ok(string_length(t) == string_length(r), "Strings are the same size");
+
+//test 2
+is("yelsnoT",r,"Strings match");
+
+free(r);
 }
 
 
