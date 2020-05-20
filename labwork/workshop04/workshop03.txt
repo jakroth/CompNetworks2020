@@ -1,0 +1,529 @@
+WORKSHOP 3                        ENGR9881 - Computer Networks
+Name: Joel Pillar-Rogers
+FAN: pill0032
+Date: 7/4/2020
+
+
+******* Makefile *******
+task1: task1.c
+	gcc task1.c -o task1 -std=c99 -Wall
+
+task2a: task2a.c
+	gcc task2a.c -o task2a -std=c99 -Wall
+
+task2b: task2b.c
+	gcc task2b.c -o task2b -std=c99 -Wall
+
+task3a: task3a.c
+	gcc task3a.c -o task3a -std=c99 -Wall
+
+task3b: task3b.c
+	gcc task3b.c -o task3b -std=c99 -Wall
+
+task4a: task4a.c
+	gcc task4a.c -o task4a -std=c99 -Wall
+
+task4b: task4b.c
+	gcc task4b.c -o task4b -std=c99 -Wall
+
+test5: task5
+	./task5
+
+clean5:
+	rm task5 task5.o reverse.o
+
+task5: reverse.o task5.o 
+	gcc -o task5 task5.o reverse.o -Wall
+
+task5.o: task5.c ctap.h reverse.h
+	gcc -c -o task5.o task5.c -Wall
+
+reverse.o: reverse.c reverse.h
+	gcc -c -o reverse.o reverse.c -Wall
+
+
+
+CHECKPOINT 1:
+******* Source Code *******
+int main(int argc, char * argv[]){
+
+    printf("The number of bits in a byte: %d\n", CHAR_BIT);
+    printf("size of char:     %lu byte(s) (%lu bits)\n", sizeof(char), sizeof(char)*CHAR_BIT);
+    printf("size of short:    %lu byte(s) (%lu bits)\n", sizeof(short), sizeof(short)*CHAR_BIT);
+    printf("size of int:      %lu byte(s) (%lu bits)\n", sizeof(int), sizeof(int)*CHAR_BIT);
+    printf("size of long:     %lu byte(s) (%lu bits)\n", sizeof(long), sizeof(long)*CHAR_BIT);
+    printf("size of float:    %lu byte(s) (%lu bits)\n", sizeof(float), sizeof(float)*CHAR_BIT);
+    printf("size of double:   %lu byte(s) (%lu bits)\n", sizeof(double), sizeof(double)*CHAR_BIT);
+    printf("size of char *:   %lu byte(s) (%lu bits)\n", sizeof(char *), sizeof(char *)*CHAR_BIT);    
+    printf("size of int *:    %lu byte(s) (%lu bits)\n", sizeof(int *), sizeof(int *)*CHAR_BIT);      
+    printf("size of double *: %lu byte(s) (%lu bits)\n", sizeof(double *), sizeof(double *)*CHAR_BIT);       
+    printf("\n");
+
+    double darr[7];
+    char flo [] = "Flinders University Online";
+    printf("size of double darr[7]: %lu byte(s) (%lu bits)\n", sizeof(darr), sizeof(darr)*CHAR_BIT);
+    printf("size of \"Flinders University Online\": %lu byte(s) (%lu bits)\n", sizeof(flo), sizeof(flo)*CHAR_BIT); 
+    printf("\n");
+
+    printf("length of double darr[7]: %lu\n", sizeof(darr)/sizeof(double));
+    printf("length of \"Flinders University Online\": %lu (including the \'\\0\' character the end)\n", sizeof(flo)/sizeof(char));
+
+    return 0; 
+}
+
+// The pointers are all the same size, at 64bits. This is because I am on a 64-bit system (I have the 64-bit VM installed). 
+
+// The size of double darr[7] will be 7 * 8 bytes = 56 bytes (448 bits).
+// The size of "Flinders University Online" is the same as char str[27], because declared inside "" it includes '\0' at the end.
+// So it will be 27 * 1 byte = 27 bytes (216 bits).
+
+// You could determine the length of an array by using sizeof(arr)/sizeof(type), where type is the type of element in the array.
+
+
+******* CLI Output *******
+student@student64:~/CompNetworks2020/labwork/workshop03$ make task1
+gcc task1.c -o task1 -std=c99 -Wall
+student@student64:~/CompNetworks2020/labwork/workshop03$ ./task1
+The number of bits in a byte: 8
+size of char:     1 byte(s) (8 bits)
+size of short:    2 byte(s) (16 bits)
+size of int:      4 byte(s) (32 bits)
+size of long:     8 byte(s) (64 bits)
+size of float:    4 byte(s) (32 bits)
+size of double:   8 byte(s) (64 bits)
+size of char *:   8 byte(s) (64 bits)
+size of int *:    8 byte(s) (64 bits)
+size of double *: 8 byte(s) (64 bits)
+
+size of double darr[7]: 56 byte(s) (448 bits)
+size of "Flinders University Online": 27 byte(s) (216 bits)
+
+length of double darr[7]: 7
+length of "Flinders University Online": 27 (including the '\0' character at the end)
+
+
+
+CHECKPOINT 2
+******* Source Code (2a) *******
+#include <stdio.h>
+#include <stdlib.h>
+
+void print(int *arr, int n);
+
+int main(int argc, char * argv[]){
+
+    int *t1 = (int *)malloc(5 * sizeof(int));
+    if(t1 == NULL){
+        exit(1);
+    }
+    for(int i = 0; i < 5; i++){
+        *(t1+i) = i;
+    }
+    print(t1,5);
+    free(t1);
+    t1 = NULL;
+    return 0; 
+}
+
+void print(int *arr, int n){
+    for(int i = 0; i < n; i++){
+        printf("[%d] %d\n", i, arr[i]);
+    }
+}
+
+******* Source Code (2b) *******
+#include <stdio.h>
+#include <stdlib.h>
+
+void print(int *arr, int n);
+
+int main(int argc, char * argv[]){
+
+    int *t1 = (int *)calloc(5, sizeof(int));
+    if(t1 == NULL){
+        exit(1);
+    }
+    for(int i = 0; i < 5; i++){
+        *(t1+i) = i;
+    }
+    print(t1,5);
+    free(t1);
+    t1 = NULL;
+    return 0; 
+}
+
+void print(int *arr, int n){
+    for(int i = 0; i < n; i++){
+        printf("[%d] %d\n", i, arr[i]);
+    }
+}
+
+
+******* CLI Output *******
+student@student64:~/CompNetworks2020/labwork/workshop03$ make task2a task2b
+gcc task2a.c -o task2a -std=c99 -Wall
+gcc task2b.c -o task2b -std=c99 -Wall
+student@student64:~/CompNetworks2020/labwork/workshop03$ ./task2a
+[0] 0
+[1] 1
+[2] 2
+[3] 3
+[4] 4
+student@student64:~/CompNetworks2020/labwork/workshop03$ ./task2b
+[0] 0
+[1] 1
+[2] 2
+[3] 3
+[4] 4
+
+
+
+CHECKPOINT 3a:
+******* Source Code *******
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <getopt.h>
+
+#define BUFFER_SIZE 1000
+
+int main(int argc, char * argv[]){
+
+    int fd = 0; // file descriptor
+    int c = 0; // command line option
+    char * buffer = "";
+    char * filename = "";
+    int index;
+    
+    if(argc < 2) {
+        printf("Usage: ./task3a -f <FILE>\n");
+        exit(1);
+    }    
+    while((c = getopt(argc, argv, ":f:")) != -1){
+        switch (c){  
+            case 'f':
+                filename = optarg;
+                break; 
+            case ':':  
+                printf("option needs a value\n");           // when no argument is passed with an option requiring an argument
+                break;  
+            case '?':  
+                printf("unknown option: %c\n", optopt);     // getopt stores error options (unknown, no argument) in optopt
+                break;  
+        }
+    }  
+    for (index = optind; index < argc; index++){            // optind is current argument number, increments with each getopt
+        printf ("Non-option argument: %s\n", argv[index]);  // this will print any excess arguments
+    }
+
+    fd = open(filename, O_RDONLY);  // read only open
+
+    buffer = (char *)malloc(BUFFER_SIZE);
+    if(buffer == NULL){
+        exit(1);    
+    }
+    
+    read(fd,buffer,BUFFER_SIZE);
+
+    write(STDOUT_FILENO,buffer,BUFFER_SIZE);
+
+    free(buffer);
+    buffer = NULL;
+
+    close(fd);
+
+    return 0;
+}
+
+
+******* CLI Output *******
+student@student64:~/CompNetworks2020/labwork/workshop03$ ./task3a
+Usage: ./task3a -f <FILE>
+student@student64:~/CompNetworks2020/labwork/workshop03$ ./task3a -f deadlock
+Deadlock occurs when all of the following apply:
+1. Mutual exclusion condition
+2. Hold and wait condition
+3. No pre-emption condition
+4. Circular wait condition
+
+Lecture5.pdf (2018)
+
+
+
+CHECKPOINT 3b:
+******* Source Code *******
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <getopt.h>
+
+#define BUFFER_SIZE 1000
+
+int main(int argc, char * argv[]){
+
+    int fd = 0; // file descriptor
+    int c = 0; // command line option
+    char * buffer = "";
+    char * filename = "";
+    int index = 0;
+    int n = 0;
+    
+    if(argc < 2) {
+        printf("Usage: ./task3b -f <FILE>\n");
+        exit(1);
+    }
+    while((c = getopt(argc, argv, ":f:")) != -1){
+        switch (c){  
+            case 'f':
+                filename = optarg;
+                break; 
+            case ':':  
+                printf("option needs a value\n");               // when no argument is passed with an option requiring an argument
+                break;  
+            case '?':  
+                printf("unknown option: %c\n", optopt);         // getopt stores error options (unknown, no argument) in optopt
+                break;  
+        }
+    }  
+    for (index = optind; index < argc; index++){                // optind is current argument number, increments with each getopt
+        printf ("Non-option argument: %s\n", argv[index]);      // this will print any excess arguments
+    }
+
+    mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;        // this mode sets the user access conditions for a newly created file
+    fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, mode);    // write only open, create if doesn't exist, truncate existing file to 0
+
+    buffer = (char *)malloc(BUFFER_SIZE);                       // create buffer with dynamic memory allocation
+    if(buffer == NULL){
+        exit(1);    
+    }
+    
+    while((n = read(STDIN_FILENO,buffer,BUFFER_SIZE)) > 0){     // read up to 1000 characters from stdin into buffer
+        write(fd,buffer,n);                                     // write up to n characters into <filename>
+    }
+                   
+    free(buffer);
+    buffer = NULL;
+
+    close(fd);
+
+    return 0;
+}
+
+
+******* CLI Output *******
+student@student64:~/CompNetworks2020/labwork/workshop03$ make task3a task3b
+gcc task3a.c -o task3a -std=c99 -Wall
+gcc task3b.c -o task3b -std=c99 -Wall
+student@student64:~/CompNetworks2020/labwork/workshop03$ ./task3b -f log
+The quick brown fox jumped over the lazy dog.
+The 
+quick
+brown
+fox
+student@student64:~/CompNetworks2020/labwork/workshop03$ ./task3a -f log
+The quick brown fox jumped over the lazy dog.
+The
+quick
+brown
+fox
+
+
+
+CHECKPOINT 4a:
+******* Source Code *******
+#include <stdio.h>
+
+int string_length(const char * str);
+
+int  main(int argc, char * argv[]){
+
+    const char * a = "";
+    const char * b = "Tonsley";
+    const char * c = "Flinders University";
+
+    printf("%d characters in \'%s\'\n",string_length(a),a);
+    printf("%d characters in \'%s\'\n",string_length(b),b);
+    printf("%d characters in \'%s\'\n",string_length(c),c);
+
+    return 0;
+}
+
+int string_length(const char * str){
+    int i = 0;
+    while(str[i]) i++;
+    return i;
+}
+
+//if the string were not properly null terminated, my string_length function would continue through the memory space until it found a 0. 
+//the length of the string literal "Operating\0System" would be 9, cause the \0 would terminate my function. 
+
+
+******* CLI Output *******
+student@student64:~/CompNetworks2020/labwork/workshop03$ make task4a
+gcc task4a.c -o task4a -std=c99 -Wall
+student@student64:~/CompNetworks2020/labwork/workshop03$ ./task4a
+0 characters in ''
+7 characters in 'Tonsley'
+19 characters in 'Flinders University'
+
+
+
+CHECKPOINT 4b:
+******* Source Code *******
+#include <stdio.h>
+#include <stdlib.h>
+
+int string_length(const char *str);
+char *reverse(const char *str);
+
+int  main(int argc, char *argv[]){
+
+    const char * a = "";
+    const char * b = "Tonsley";
+    const char * c = "Flinders University";
+
+    char * aR = reverse(a);
+    char * bR = reverse(b);
+    char * cR = reverse(c);
+
+    printf("\'%s\'\n",aR);
+    printf("\'%s\'\n",bR);
+    printf("\'%s\'\n",cR);
+
+    free(aR);
+    free(bR);
+    free(cR);
+
+    return 0;
+}
+
+int string_length(const char *str){
+    int i = 0;
+    while(str[i]) i++;
+    return i;
+}
+
+char *reverse(const char *str){
+    int len = string_length(str);
+    char * new_str = (char *)malloc(len * sizeof(char));
+    for(int i = 0; i < len; i++){
+        *(new_str+i) = *(str+len-i-1);
+    }
+    return new_str;
+}
+
+
+******* CLI Output *******
+student@student64:~/CompNetworks2020/labwork/workshop03$ make task4b
+gcc task4b.c -o task4b -std=c99 -Wall
+student@student64:~/CompNetworks2020/labwork/workshop03$ ./task4b
+''
+'yelsnoT'
+'ytisrevinU srednilF'
+
+
+
+CHECKPOINT 5:
+******* Source Code - reverse.h*******
+#ifndef REVERSE_H
+#define REVERSE_H
+
+int string_length(const char *str);
+
+char *reverse(const char *str);
+
+#endif
+
+
+******* Source Code - reverse.c*******
+#include <stdlib.h>
+#include "reverse.h"
+
+int string_length(const char *str){
+    int i = 0;
+    while(str[i]) i++;
+    return i;
+}
+
+char *reverse(const char *str){
+    int len = string_length(str);
+    char * new_str = (char *)malloc(len * sizeof(char));
+    for(int i = 0; i < len; i++){
+        *(new_str+i) = *(str+len-i-1);
+    }
+    return new_str;
+}
+
+
+******* Source Code - task5.c*******
+#include "ctap.h"
+#include "reverse.h"
+
+TESTS {
+const char *t = "Tonsley";
+char *r = reverse(t);
+
+//test 1
+ok(string_length(t) == string_length(r), "Strings are the same size");
+
+//test 2
+is("yelsnoT",r,"Strings match");
+
+free(r);
+}
+
+
+******* CLI Output *******
+student@student64:~/CompNetworks2020/labwork/workshop03$ make clean5
+rm task5 task5.o reverse.o
+student@student64:~/CompNetworks2020/labwork/workshop03$ make task5
+gcc -c -o reverse.o reverse.c -Wall
+gcc -c -o task5.o task5.c -Wall
+gcc -o task5 task5.o reverse.o -Wall
+student@student64:~/CompNetworks2020/labwork/workshop03$ make test5
+./task5
+ok 1 - Strings are the same size
+ok 2 - Strings match
+1..2
+
+
+******* Makefile *******
+task1: task1.c
+	gcc task1.c -o task1 -std=c99 -Wall
+
+task2a: task2a.c
+	gcc task2a.c -o task2a -std=c99 -Wall
+
+task2b: task2b.c
+	gcc task2b.c -o task2b -std=c99 -Wall
+
+task3a: task3a.c
+	gcc task3a.c -o task3a -std=c99 -Wall
+
+task3b: task3b.c
+	gcc task3b.c -o task3b -std=c99 -Wall
+
+task4a: task4a.c
+	gcc task4a.c -o task4a -std=c99 -Wall
+
+task4b: task4b.c
+	gcc task4b.c -o task4b -std=c99 -Wall
+
+test5: task5
+	./task5
+
+clean5:
+	rm task5 task5.o reverse.o
+
+task5: reverse.o task5.o 
+	gcc -o task5 task5.o reverse.o -Wall
+
+task5.o: task5.c ctap.h reverse.h
+	gcc -c -o task5.o task5.c -Wall
+
+reverse.o: reverse.c reverse.h
+	gcc -c -o reverse.o reverse.c -Wall
