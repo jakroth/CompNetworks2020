@@ -1,5 +1,4 @@
 #include "ctap.h"
-#include "reverse.h"
 
 TESTS {
 const char *t = "Tonsley";

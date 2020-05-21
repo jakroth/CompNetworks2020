@@ -1,0 +1,5 @@
+these are some words to print
+they are written on separate lines
+they contain some letters and numb3rs
+also some punctuation. and characters!
+i wonder what "quotation marks' do:
