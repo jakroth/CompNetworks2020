@@ -1,4 +1,4 @@
-all: clean task1 task2
+all: clean task1 task2 task3
 
 task1: task1.c
 	gcc task1.c -o task1 -Wall
@@ -6,8 +6,11 @@ task1: task1.c
 task2: task2.c
 	gcc task2.c -o task2 -Wall
 
+task3: task3.c
+	gcc task3.c -o task3 -Wall
+
 clean: 
-	rm task1 task2
+	rm task1 task2 task3
 
 
 
