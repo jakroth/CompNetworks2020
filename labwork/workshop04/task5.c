@@ -5,14 +5,15 @@
 
 /* functions */
 /* iterate through loops loops, return value of i */
-int iterate(int loops){
+long long iterate(long long loops){
     int i;
     for(i = 0; i < loops; i++){
+        for(int j = 0; j < 1000; j++){}     // slow down the loops a bit, something was breaking at 10,000,000,000 loops
     }
     return i;
 }
 
-/* return microsecs in long */
+/* load start time in timeval struct, return success 1, or fail 0 */
 int start(struct timeval *t){
     gettimeofday(t, NULL);
     if(t!=NULL){
@@ -21,7 +22,7 @@ int start(struct timeval *t){
     return 0;
 }
 
-/* return microsecs in long */
+/* load stop time in timeval struct, return success 1, or fail 0 */
 int stop(struct timeval *t){
     gettimeofday(t, NULL);
     if(t!=NULL){
@@ -33,46 +34,34 @@ int stop(struct timeval *t){
 /* return difference in secs between two timevals */
 float difference(struct timeval *t1, struct timeval *t2){
     float time;
-    float time2;
-    fprintf(stderr,"t1 secs %ld\n", t1->tv_sec);
-    fprintf(stderr,"t2 secs %ld\n", t2->tv_sec);
-    fprintf(stderr,"t1 microsecs %ld\n", t1->tv_usec);
-    fprintf(stderr,"t2 microsecs %ld\n", t2->tv_usec);
     time = t2->tv_sec - t1->tv_sec;
-    fprintf(stderr,"secs: %f\n", time);
-    time2 = (t2->tv_usec - t1->tv_usec)/1000000; 
-    fprintf(stderr,"microsecs: %f\n", time2);
+    time += (float)(t2->tv_usec - t1->tv_usec)/1000000; // convert microseconds to seconds
     return time;
 }
 
 TESTS{   
     /* define appropriate structures */
-        struct timeval startTime;
-        struct timeval stopTime;
-        float diffTime = 0;
-        int loops = 10000000000;
-        char timetaken[50];
-        setbuf(stdout, NULL);
+    struct timeval startTime;
+    struct timeval stopTime;
+    float diffTime = 0;
+    long long loops = 1000000;          // I increased loop by * 10 each time, then * 2 the last time. See CLI printouts.                       
+    char timetaken[50];
 
-        /* record time taken to iterate over loops loops */
-        note("Time to compute steps\n");                    // I couln't get note() to work. stdout is not working for some reason. 
-        ctap_diag(stderr, "Time to compute steps");         // Couldn't make ctap_diag() work either. 
-        diag("Time to compute steps");                      // Replaced with diag(), which prints to stderr. 
-        ok(start(&startTime) == 1, "get the start time");
-        ok(iterate(loops) == loops, "iterate through the loop");
-        ok(stop(&stopTime) == 1, "get the stop time");
-        printf("microsecs: ");
-        fflush(stdout);   
+    /* record time taken to iterate over loops loops */
+    //note("Time to compute steps");                            // note() doesn't work because ctap.h is grabbing stdout.
+    //ctap_diag(CTAP.priv_stdout, "Time to compute steps");     // ctap_diag() (which is what note() is defined as) only works if stdout is changed to CTAP's priv stdout. 
+    
+    diag("Time to compute with loops = %lld", loops);           // Replaced with diag(), which prints to stderr. 
+    ok(start(&startTime) == 1, "get the start time");           // test whether load start time worked
+    ok(iterate(loops) == loops, "iterate through the loop");    // test whether iteration worked
+    ok(stop(&stopTime) == 1, "get the stop time");              // test whether load stop time worked
 
-        /* compute elapsed time and convert to string */
-        diffTime = difference(&startTime, &stopTime);
-        sprintf(timetaken,"%f seconds", diffTime);
-        note("Compute time taken %s", timetaken);          // I couln't get note() to work.
-        diag("Compute time taken %s", timetaken);          // Replaced with diag()
+    /* compute elapsed time and convert to string */
+    diffTime = difference(&startTime, &stopTime);
+    sprintf(timetaken,"%f seconds", diffTime);
+    diag("Compute time taken %s", timetaken);                   // note() replaced with diag()
 
-        /* use the appropriate time unit for comparison */
-        ok(diffTime < 60, "time was less than 60 seconds");
+    /* use the appropriate time unit for comparison */
+    ok(diffTime < 60, "time was less than 60 seconds");         // test whether timetaken is less than 60 seconds
 
-    TODO("to implement"){ 
-    }
 }

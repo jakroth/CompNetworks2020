@@ -489,50 +489,137 @@ elapsed time (usecs): 123
 
 CHECKPOINT 5:
 ******* Source Code *******
+#include <stdio.h> 
+#include <sys/time.h>   // for gettimeofday()
+#include "ctap.h"       // for ctap tests
 
+
+/* functions */
+/* iterate through loops loops, return value of i */
+long long iterate(long long loops){
+    int i;
+    for(i = 0; i < loops; i++){
+        for(int j = 0; j < 1000; j++){}     // slow down the loops a bit, something was breaking at 10,000,000,000 loops
+    }
+    return i;
+}
+
+/* load start time in timeval struct, return success 1, or fail 0 */
+int start(struct timeval *t){
+    gettimeofday(t, NULL);
+    if(t!=NULL){
+        return 1;
+    }
+    return 0;
+}
+
+/* load stop time in timeval struct, return success 1, or fail 0 */
+int stop(struct timeval *t){
+    gettimeofday(t, NULL);
+    if(t!=NULL){
+        return 1;
+    }
+    return 0;
+}
+
+/* return difference in secs between two timevals */
+float difference(struct timeval *t1, struct timeval *t2){
+    float time;
+    time = t2->tv_sec - t1->tv_sec;
+    time += (float)(t2->tv_usec - t1->tv_usec)/1000000; // convert microseconds to seconds
+    return time;
+}
+
+TESTS{   
+    /* define appropriate structures */
+    struct timeval startTime;
+    struct timeval stopTime;
+    float diffTime = 0;
+    long long loops = 20000000;          // I increased loop by * 10 each time, then * 2 the last time. See CLI printouts.                       
+    char timetaken[50];
+
+    /* record time taken to iterate over loops loops */
+    //note("Time to compute steps");                            // note() doesn't work because ctap.h is grabbing stdout.
+    //ctap_diag(CTAP.priv_stdout, "Time to compute steps");     // ctap_diag() (which is what note() is defined as) only works if stdout is changed to CTAP's priv stdout. 
+    
+    diag("Time to compute with loops = %lld", loops);           // Replaced with diag(), which prints to stderr. 
+    ok(start(&startTime) == 1, "get the start time");           // test whether load start time worked
+    ok(iterate(loops) == loops, "iterate through the loop");    // test whether iteration worked
+    ok(stop(&stopTime) == 1, "get the stop time");              // test whether load stop time worked
+
+    /* compute elapsed time and convert to string */
+    diffTime = difference(&startTime, &stopTime);
+    sprintf(timetaken,"%f seconds", diffTime);
+    diag("Compute time taken %s", timetaken);                   // note() replaced with diag()
+
+    /* use the appropriate time unit for comparison */
+    ok(diffTime < 60, "time was less than 60 seconds");         // test whether timetaken is less than 60 seconds
+
+}
 
 
 
 ******* CLI Output *******
+student@student64:~/CompNetworks2020/labwork/workshop04$ ./task5
+# Time to compute with loops = 100,000
+ok 1 - get the start time
+ok 2 - iterate through the loop
+ok 3 - get the stop time
+# Compute time taken 0.354806 seconds
+ok 4 - time was less than 60 seconds
+1..4
 
+student@student64:~/CompNetworks2020/labwork/workshop04$ ./task5
+# Time to compute with loops = 1,000,000
+ok 1 - get the start time
+ok 2 - iterate through the loop
+ok 3 - get the stop time
+# Compute time taken 3.807363 seconds
+ok 4 - time was less than 60 seconds
+1..4
 
+student@student64:~/CompNetworks2020/labwork/workshop04$ ./task5
+# Time to compute with loops = 10,000,000
+ok 1 - get the start time
+ok 2 - iterate through the loop
+ok 3 - get the stop time
+# Compute time taken 37.353291 seconds
+ok 4 - time was less than 60 seconds
+1..4
+
+student@student64:~/CompNetworks2020/labwork/workshop04$ ./task5
+# Time to compute with loops = 20,000,000
+ok 1 - get the start time
+ok 2 - iterate through the loop
+ok 3 - get the stop time
+# Compute time taken 74.270805 seconds
+not ok 4 - time was less than 60 seconds
+#   Failed test 'time was less than 60 seconds'
+#   at task5.c line 65.
+1..4
+# Looks like you failed 1 test of 4.
 
 
 
 
 ******* Makefile *******
+all: task1 task2 task3 task4 task5
+
 task1: task1.c
-	gcc task1.c -o task1 -std=c99 -Wall
+	gcc task1.c -o task1 -Wall
 
-task2a: task2a.c
-	gcc task2a.c -o task2a -std=c99 -Wall
+task2: task2.c
+	gcc task2.c -o task2 -Wall
 
-task2b: task2b.c
-	gcc task2b.c -o task2b -std=c99 -Wall
+task3: task3.c
+	gcc task3.c -o task3 -Wall
 
-task3a: task3a.c
-	gcc task3a.c -o task3a -std=c99 -Wall
+task4: task4.c
+	gcc task4.c -o task4 -Wall
 
-task3b: task3b.c
-	gcc task3b.c -o task3b -std=c99 -Wall
+task5: task5.c
+	gcc task5.c -o task5 -Wall
 
-task4a: task4a.c
-	gcc task4a.c -o task4a -std=c99 -Wall
+clean: 
+	rm task1 task2 task3 task4 task5
 
-task4b: task4b.c
-	gcc task4b.c -o task4b -std=c99 -Wall
-
-test5: task5
-	./task5
-
-clean5:
-	rm task5 task5.o reverse.o
-
-task5: reverse.o task5.o 
-	gcc -o task5 task5.o reverse.o -Wall
-
-task5.o: task5.c ctap.h reverse.h
-	gcc -c -o task5.o task5.c -Wall
-
-reverse.o: reverse.c reverse.h
-	gcc -c -o reverse.o reverse.c -Wall
