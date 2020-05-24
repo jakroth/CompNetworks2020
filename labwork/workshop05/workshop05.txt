@@ -196,13 +196,7 @@ tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 1500 bytes
     216.58.199.35 > 10.0.2.15: ICMP echo reply, id 13477, seq 2, length 64
 
 
-
-CHECKPOINT 4: 
+CHECKPOINT 4 & 5: 
 See workshop-images.pdf
-
-
-
-CHECKPOINT 5:
-******* CLI Output *******
 
 
