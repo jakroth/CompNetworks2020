@@ -197,31 +197,12 @@ tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 1500 bytes
 
 
 
-CHECKPOINT 4 and 5: See workshop-images.pdf
-
-
-******* CLI Output *******
-root@student64:~# tcpdump -i eth0 -w network-traffic.cap
-tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
-^C
-1424 packets captured
-1424 packets received by filter
-0 packets dropped by kernel
-
-
-
-root@student64:~# wireshark -r network-traffic.cap 
+CHECKPOINT 4: 
+See workshop-images.pdf
 
 
 
 CHECKPOINT 5:
-******* Source Code *******
-
-
-
 ******* CLI Output *******
 
-
-
-******* Makefile *******
 
