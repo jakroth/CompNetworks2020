@@ -129,7 +129,7 @@ Q) What does the -vvv and -s 1500 flags do?
 -vvv prints the most verbose output
 
 From the tcpdump man page:
--Includes: the time to live, identification, total length and options in an IP packet are printed.  
+-The time to live, identification, total length and options in an IP packet are printed.  
 -Additional packet integrity checks such as verifying the IP and ICMP header checksum.
 -Additional fields are printed from NFS reply packets, and SMB packets are fully decoded.
 -Telnet SB ... SE options are printed in full. 
@@ -197,6 +197,6 @@ tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 1500 bytes
 
 
 CHECKPOINT 4 & 5: 
-See workshop-images.pdf
+See workshop05-chkpts4&5.pdf
 
 
