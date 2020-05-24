@@ -1,0 +1,227 @@
+WORKSHOP 5                        ENGR9881 - Computer Networks
+Name: Joel Pillar-Rogers
+FAN: pill0032
+Date: 24/5/2020
+
+
+CHECKPOINT 1:
+******* Source Code *******
+#!/bin/sh
+a=1
+while [ $a -gt 0 ] # if a is greater than zero
+	do
+	sleep 1 # sleep for ten seconds
+
+	## BODY OF TEST GOES HERE
+	#ping without printing to console
+	#from https://www.unix.com/shell-programming-and-scripting/140143-suppress-output-ping.html
+	#moves stdout to stderr and redirects to /dev/null
+	ping -c 1 10.0.2.2 2>&1 >/dev/null
+
+	## if ping fails set loop counter to zero
+	if [ $? -ne 0 ] ; then
+		export status="Gateway: Fail."
+		a=0;
+	else
+		export status="Gateway: OK."
+	fi
+
+	#calculate received and transmitted bytes
+	export rbytes=`/sbin/ifconfig eth0 | grep "RX packets" | sed -e "s/.*bytes//" | sed -e "s/(.*//"`
+	export tbytes=`/sbin/ifconfig eth0 | grep "TX packets" | sed -e "s/.*bytes//" | sed -e "s/(.*//"`
+
+	#calculate date and time
+	export date=`date +%Y/%m/%d`
+	export time=`date +%T`
+
+	#print everything to console
+	echo "Time:" $date"-"$time", Rx:" $rbytes "bytes, Tx:" $tbytes "bytes," $status
+done
+
+******* CLI Output *******
+student@student64:~/CompNetworks2020/labwork/workshop05$ bash task.sh
+Time: 2020/05/24-11:37:34, Rx: 167931808 bytes, Tx: 12014582 bytes, Gateway: OK.
+Time: 2020/05/24-11:37:35, Rx: 168184670 bytes, Tx: 12016644 bytes, Gateway: OK.
+Time: 2020/05/24-11:37:36, Rx: 168208049 bytes, Tx: 12017092 bytes, Gateway: OK.
+Time: 2020/05/24-11:37:37, Rx: 168213696 bytes, Tx: 12020576 bytes, Gateway: OK.
+
+
+// if I change to a bad ping address //
+student@student64:~/CompNetworks2020/labwork/workshop05$ bash task.sh
+Time: 2020/05/24-11:38:25, Rx: 125858005 bytes, Tx: 9964914 bytes, Gateway: Fail.
+
+
+
+CHECKPOINT 2:
+******* CLI Output *******
+Q) Can you capture packets with tcpdump and display in the terminal?
+root@student64:~# tcpdump -i eth0
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+13:33:13.236309 IP 69.63.2ca9.ip4.static.sl-reverse.com.https > 10.0.2.15.59336: Flags [P.], seq 44267046:44267077, ack 2671986611, win 65535, length 31
+13:33:13.236449 IP 10.0.2.15.59336 > 69.63.2ca9.ip4.static.sl-reverse.com.https: Flags [P.], seq 1:36, ack 31, win 39760, length 35
+13:33:13.236778 IP 10.0.2.15.54051 > 10.0.0.1.domain: 39288+ PTR? 15.2.0.10.in-addr.arpa. (40)
+13:33:13.236878 IP 69.63.2ca9.ip4.static.sl-reverse.com.https > 10.0.2.15.59336: Flags [.], ack 36, win 65535, length 0
+13:33:13.241785 IP 10.0.0.1.domain > 10.0.2.15.54051: 39288 NXDomain* 0/0/0 (40)
+13:33:13.241960 IP 10.0.2.15.40956 > 10.0.0.1.domain: 30094+ PTR? 105.99.44.169.in-addr.arpa. (44)
+13:33:13.248776 IP 10.0.0.1.domain > 10.0.2.15.40956: 30094 1/0/0 PTR 69.63.2ca9.ip4.static.sl-reverse.com. (94)
+...
+13:33:25.319426 IP 10.0.2.15 > syd09s12-in-f3.1e100.net: ICMP echo request, id 11054, seq 13, length 64
+13:33:25.352666 IP syd09s12-in-f3.1e100.net > 10.0.2.15: ICMP echo reply, id 11054, seq 13, length 64
+^C
+46 packets captured
+46 packets received by filter
+0 packets dropped by kernel
+
+
+Q) Can you capture packets to a file with tcpdump?
+root@student64:~# tcpdump -i eth0 > network-traffic.cap
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+^C
+812 packets captured
+1290 packets received by filter
+478 packets dropped by kernel
+
+Alternatively:
+root@student64:~# tcpdump -i eth0 -w network-traffic.cap
+tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+^C
+27 packets captured
+27 packets received by filter
+0 packets dropped by kernel
+
+
+root@student64:~# ping google.com.au
+PING google.com.au (142.250.66.163) 56(84) bytes of data.
+64 bytes from syd09s22-in-f3.1e100.net (142.250.66.163): icmp_seq=1 ttl=48 time=31.9 ms
+64 bytes from syd09s22-in-f3.1e100.net (142.250.66.163): icmp_seq=2 ttl=48 time=31.9 ms
+
+
+root@student64:~# wget flinders.edu.au
+--2020-05-24 13:37:46--  http://flinders.edu.au/
+Resolving flinders.edu.au (flinders.edu.au)... 129.96.88.39
+Connecting to flinders.edu.au (flinders.edu.au)|129.96.88.39|:80... connected.
+HTTP request sent, awaiting response... 301 Moved permanently
+Location: http://www.flinders.edu.au/ [following]
+--2020-05-24 13:37:47--  http://www.flinders.edu.au/
+Resolving www.flinders.edu.au (www.flinders.edu.au)... 13.35.149.98, 13.35.149.101, 13.35.149.100, ...
+Connecting to www.flinders.edu.au (www.flinders.edu.au)|13.35.149.98|:80... connected.
+HTTP request sent, awaiting response... 301 Moved Permanently
+Location: https://www.flinders.edu.au/ [following]
+--2020-05-24 13:37:47--  https://www.flinders.edu.au/
+Connecting to www.flinders.edu.au (www.flinders.edu.au)|13.35.149.98|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+Saving to: ‘index.html’
+
+index.html                            [ <=>                                                        ] 123.64K  --.-KB/s    in 0.08s   
+
+2020-05-24 13:37:47 (1.53 MB/s) - ‘index.html’ saved [126609]
+
+
+
+CHECKPOINT 3:
+******* CLI Output *******
+Q) What does the -vvv and -s 1500 flags do?
+-v stands for verbose and prints more output to the console for tcpdump. 
+-vv prints more output
+-vvv prints the most verbose output
+
+From the tcpdump man page:
+-Includes: the time to live, identification, total length and options in an IP packet are printed.  
+-Additional packet integrity checks such as verifying the IP and ICMP header checksum.
+-Additional fields are printed from NFS reply packets, and SMB packets are fully decoded.
+-Telnet SB ... SE options are printed in full. 
+
+-s 1500 stands for snapshot-length = 1500 bytes. It truncates each packet at 1500 bytes, so just gets the header info mainly.
+    Can decrease the time to process packets. 
+
+From the man page:
+Snarf snaplen bytes of data from each packet rather than the default of 262144 bytes.  Packets truncated because  of
+a  limited  snapshot are indicated in the output with ``[|proto]'', where proto is the name of the protocol level at
+which the truncation has occurred.  Note that taking larger snapshots both increases the amount of time it takes  to
+process packets and, effectively, decreases the amount of packet buffering.  This may cause packets to be lost.  You
+should limit snaplen to the smallest number that will capture the protocol information you're interested  in.   Set‐
+ting  snaplen  to 0 sets it to the default of 262144, for backwards compatibility with recent older versions of tcp‐
+dump.
+
+
+Q) Can you identify packets on UDP or TCP port 53, source and destination hosts when using the web
+browser?
+root@student64:~# tcpdump -s 1500 -vvv -n 'tcp port 53 or udp port 53'
+tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 1500 bytes
+14:25:56.491932 IP (tos 0x0, ttl 64, id 26902, offset 0, flags [DF], proto UDP (17), length 65)
+    10.0.2.15.54706 > 10.0.0.1.53: [bad udp cksum 0x164e -> 0x3bb0!] 28048+ A? flo.flinders.edu.au. (37)
+14:25:56.505665 IP (tos 0x0, ttl 64, id 25562, offset 0, flags [none], proto UDP (17), length 197)
+    10.0.0.1.53 > 10.0.2.15.54706: [udp sum ok] 28048 q: A? flo.flinders.edu.au. 5/0/0 flo.flinders.edu.au. 
+    [1s] CNAME flinders-mdl-prod.svc.netspot.com.au., flinders-mdl-prod.svc.netspot.com.au. 
+    [1s] CNAME flinders-mdl-prod.aws.netspot.com.au., flinders-mdl-prod.aws.netspot.com.au. 
+    [1s] A 3.105.122.181, flinders-mdl-prod.aws.netspot.com.au. 
+    [1s] A 52.63.241.169, flinders-mdl-prod.aws.netspot.com.au. 
+    [1s] A 13.236.166.19 (169)
+14:25:58.412919 IP (tos 0x0, ttl 64, id 27031, offset 0, flags [DF], proto UDP (17), length 61)
+    10.0.2.15.53042 > 10.0.0.1.53: [bad udp cksum 0x164a -> 0xe376!] 15399+ A? flinders.edu.au. (33)
+14:25:58.412950 IP (tos 0x0, ttl 64, id 27032, offset 0, flags [DF], proto UDP (17), length 61)
+    10.0.2.15.53042 > 10.0.0.1.53: [bad udp cksum 0x164a -> 0x2355!] 57672+ AAAA? flinders.edu.au. (33)
+14:25:58.432332 IP (tos 0x0, ttl 64, id 25570, offset 0, flags [none], proto UDP (17), length 113)
+    10.0.0.1.53 > 10.0.2.15.53042: [udp sum ok] 57672 q: AAAA? flinders.edu.au. 0/1/0 ns: flinders.edu.au. 
+    [59m10s] SOA frodo.cc.flinders.edu.au. sysadm.flinders.edu.au. 2020051504 7200 1800 1209600 86400 (85)
+
+ALternatively, with src and destination specified:
+root@student64:~# tcpdump -s 1500 -vvv -n 'tcp port 53 or udp port 53 and src 10.0.2.15 and dst 10.0.0.1'
+tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 1500 bytes
+15:05:45.787285 IP (tos 0x0, ttl 64, id 47611, offset 0, flags [DF], proto UDP (17), length 60)
+    10.0.2.15.46366 > 10.0.0.1.53: [bad udp cksum 0x1649 -> 0xc127!] 58475+ A? www.google.com. (32)
+15:05:51.195399 IP (tos 0x0, ttl 64, id 48073, offset 0, flags [DF], proto UDP (17), length 65)
+    10.0.2.15.39117 > 10.0.0.1.53: [bad udp cksum 0x164e -> 0x116f!] 8394+ A? www.somewebsite.com. (37)
+15:05:51.195460 IP (tos 0x0, ttl 64, id 48074, offset 0, flags [DF], proto UDP (17), length 65)
+    10.0.2.15.39117 > 10.0.0.1.53: [bad udp cksum 0x164e -> 0x3c60!] 56024+ AAAA? www.somewebsite.com. (37)
+15:05:55.202876 IP (tos 0x0, ttl 64, id 48615, offset 0, flags [DF], proto UDP (17), length 65)
+    10.0.2.15.39117 > 10.0.0.1.53: [bad udp cksum 0x164e -> 0x116f!] 8394+ A? www.somewebsite.com. (37)
+15:05:55.202901 IP (tos 0x0, ttl 64, id 48616, offset 0, flags [DF], proto UDP (17), length 65)
+    10.0.2.15.39117 > 10.0.0.1.53: [bad udp cksum 0x164e -> 0x3c60!] 56024+ AAAA? www.somewebsite.com. (37)
+
+
+Q) Can you identify packets with a protocols other than TCP/IP or UDP/IP ?
+root@student64:~# tcpdump -s 1500 -vvv -n '!tcp and !udp'
+tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 1500 bytes
+15:10:56.375646 IP (tos 0x0, ttl 64, id 60730, offset 0, flags [DF], proto ICMP (1), length 84)
+    10.0.2.15 > 216.58.199.35: ICMP echo request, id 13477, seq 1, length 64
+15:10:56.410244 IP (tos 0x0, ttl 48, id 40111, offset 0, flags [none], proto ICMP (1), length 84)
+    216.58.199.35 > 10.0.2.15: ICMP echo reply, id 13477, seq 1, length 64
+15:10:57.376603 IP (tos 0x0, ttl 64, id 60889, offset 0, flags [DF], proto ICMP (1), length 84)
+    10.0.2.15 > 216.58.199.35: ICMP echo request, id 13477, seq 2, length 64
+15:10:57.408440 IP (tos 0x0, ttl 48, id 40113, offset 0, flags [none], proto ICMP (1), length 84)
+    216.58.199.35 > 10.0.2.15: ICMP echo reply, id 13477, seq 2, length 64
+
+
+
+CHECKPOINT 4 and 5: See workshop-images.pdf
+
+
+******* CLI Output *******
+root@student64:~# tcpdump -i eth0 -w network-traffic.cap
+tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+^C
+1424 packets captured
+1424 packets received by filter
+0 packets dropped by kernel
+
+
+
+root@student64:~# wireshark -r network-traffic.cap 
+
+
+
+CHECKPOINT 5:
+******* Source Code *******
+
+
+
+******* CLI Output *******
+
+
+
+******* Makefile *******
+
