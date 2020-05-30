@@ -53,7 +53,7 @@ int main (int argc, char**argv){
     
 	// checks there are exactly 4 arguments provided on the command line
 	if (argc != 4){
-		printf("Error usage: %s <ip_serv> <port_serv> <filename>\n",argv[0]);
+		printf("Usage error: %s <ip_serv> <port_serv> <filename>\n",argv[0]);
 		return EXIT_FAILURE;
 	}
     
@@ -77,7 +77,7 @@ int main (int argc, char**argv){
 		sz=filestat.st_size;
     
 	// bzero sets all the bytes in the buffer to zero
-	bzero(&buffer,BUFFER);
+	bzero(buffer,BUFFER);
     
 	// initiates a tcp socket connection between the local socket and the socket on the server
 	// sfd (the local socket) and sock_serv (the server socket address) were set up earlier

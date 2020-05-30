@@ -76,7 +76,7 @@ int main (int argc, char**argv){
 		sz=filestat.st_size;
     
 	// bzero sets all the bytes in the buffer to zero
-	bzero(&buffer,BUFFER);
+	bzero(buffer,BUFFER);
     
 	// start the timer before sending data
 	gettimeofday(&start,NULL);
