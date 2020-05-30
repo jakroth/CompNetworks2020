@@ -79,7 +79,7 @@ int main (int argc, char**argv){
 	// bzero sets all the bytes in the buffer to zero
 	bzero(&buffer,BUFFER);
     
-	// initiates a socket connection between the local socket and the socket on the server
+	// initiates a tcp socket connection between the local socket and the socket on the server
 	// sfd (the local socket) and sock_serv (the server socket address) were set up earlier
 	// sock_serv is an ip socket address, so needs to be cast to a general socket address to use as a parameter
 	// prints an error if unsuccessful
@@ -119,17 +119,23 @@ int main (int argc, char**argv){
 		// read the next section of the file into the buffer
         n=read(fd,buffer,BUFFER);
 	}
-	//read has just returned 0: end of file
+	// read has returned 0 = end of file
 	
-	//to unlock the server
+	// original comment said this is "to unlock the server" - not sure why it does that. may be something on the server side
+	// sends 0 bytes to the server
 	m=sendto(sfd,buffer,0,0,(struct sockaddr*)&sock_serv,l);
+
+	// gets the end time after sending all packets
 	gettimeofday(&stop,NULL);
+	//calculates the duration of packet sending
 	duration(&start,&stop,&delta);
     
+	// print all the values from the whole process
 	printf("Number of bytes transferred: %lld\n",count);
-	printf("On a total size of: %lld \n",sz);
+	printf("Out of a total size of: %lld \n",sz);
 	printf("For a total duration of: %ld.%d \n",delta.tv_sec,delta.tv_usec);
     
+	//close the local socket
     close(sfd);
 	return EXIT_SUCCESS;
 }
@@ -162,7 +168,7 @@ int create_client_socket (int port, char* ipaddr){
     int l;
 	int sfd;
     
-	// setting up the local socket
+	// *****setting up the local socket
 	// uses the ip4 address family and the tcp connection-oriented sock stream (and the default protocol, 0)
 	// assigns a file descriptor integer to sfd, for use in main
 	sfd = socket(AF_INET,SOCK_STREAM,0);
@@ -171,10 +177,9 @@ int create_client_socket (int port, char* ipaddr){
         return EXIT_FAILURE;
 	}
     
-	// preparing the destination socket address
+	// *****preparing the destination socket address
 	// finds the size of a sockadd_in struct
 	l=sizeof(struct sockaddr_in);
-	
 	// zeroes the struct so no info is hanging around
 	bzero(&sock_serv,l);
 
