@@ -28,23 +28,21 @@
 #include <unistd.h>
 #include <strings.h>
 
-/* Taille du buffer utilise pour envoyer le fichier
- * en plusieurs blocs
- */
-#define BUFFERT 512
-/* Taille de la file d'attente des clients */
+/* Buffer size used to send the file in several blocks */
+#define BUFFER 512
+/* Client queue size*/
 #define BACKLOG 1
 
-/* Commande pou génerer un fichier de test
+/* Command to generate a test file (uses Linux' built in randomiser and the dd command)
  * dd if=/dev/urandom of=fichier count=8
  */
 
-/* Declaration des fonctions*/
+/* Declaration of functions*/
 int duration (struct timeval *start,struct timeval *stop, struct timeval *delta);
 int create_server_socket (int port);
 
+// Structs to hold details about the server and client sockets
 struct sockaddr_in sock_serv,sock_clt;
-
 
 int main(int argc,char** argv){
     int sfd,fd;
@@ -52,21 +50,27 @@ int main(int argc,char** argv){
     long int n, m,count=0;
     unsigned int nsid;
     ushort clt_port;
-    char buffer[BUFFERT],filename[256];
+    char buffer[BUFFER],filename[256];
     char dst[INET_ADDRSTRLEN];
     
-    // Variable pour la date
+    // variables to save the date
 	time_t intps;
 	struct tm* tmi;
-    
+
+    // checks there are exactly 2 arguments provided on the command line
     if(argc!=2) {
-        perror("utilisation ./a.out <num_port> <file2send>\n");
+        perror("Error usage : %s <port_serv>\n",argv[0]);
         exit(3);
     }
     
+   	// calls the create server socket function, using the port address of the server 
+	// and stores the returned socket file descriptor in sfd
     sfd = create_server_socket(atoi(argv[1]));
     
-    bzero(buffer,BUFFERT);
+    // bzero sets all the bytes in the buffer to zero
+    bzero(&buffer,BUFFER);
+
+    
     listen(sfd,BACKLOG);
     
     //Fonction qui attent la fonction connecte du client

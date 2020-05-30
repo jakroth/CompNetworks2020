@@ -53,11 +53,11 @@ int main (int argc, char**argv){
     
 	// checks there are exactly 4 arguments provided on the command line
 	if (argc != 4){
-		printf("Error usage : %s <ip_serv> <port_serv> <filename>\n",argv[0]);
+		printf("Error usage: %s <ip_serv> <port_serv> <filename>\n",argv[0]);
 		return EXIT_FAILURE;
 	}
     
-	// calls the create local socket function, using the port and ip address of the destination server 
+	// calls the create client socket function, using the port and ip address of the destination server 
 	// and stores the returned file descriptor in sfd
     sfd=create_client_socket(atoi(argv[2]), argv[1]);
     
