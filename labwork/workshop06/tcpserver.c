@@ -1,8 +1,12 @@
 /*
- * File : server.c
- * Author : Amine Amanzou
- *
- * Created : 4th January 2013
+ * File : tcpserver.c
+ * 
+ * Author: Joel Pillar-Rogers
+ * 
+ * Acknowledgment: adapted from a project by Amine Amanzou 
+ * https://github.com/amineamanzou/UDP-TCP-File-Transfer
+ * 
+ * Created on 20 May 2020
  *
  * Under GNU Licence
  */
