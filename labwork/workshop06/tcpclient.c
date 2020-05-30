@@ -46,7 +46,8 @@ int main (int argc, char**argv){
 	struct timeval start, stop, delta;
     int sfd,fd;
     char buffer[BUFFER];
-    off_t count=0, m,sz; //long
+	long long count = 0,sz;
+    off_t m; //long
 	long int n;
     int l = sizeof(struct sockaddr_in);
 	struct stat filestat;
@@ -132,8 +133,8 @@ int main (int argc, char**argv){
     
 	// print all the values from the whole process
 	printf("Number of bytes transferred: %lld\n",count);
-	printf("Out of a total size of: %lld \n",sz);
-	printf("For a total duration of: %ld.%d \n",delta.tv_sec,delta.tv_usec);
+	printf("Out of a total file size of: %lld \n",sz);
+	printf("For a total duration of: %ld.%ld \n",delta.tv_sec,delta.tv_usec);
     
 	//close the local socket
     close(sfd);

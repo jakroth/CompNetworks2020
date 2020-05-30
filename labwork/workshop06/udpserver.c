@@ -44,78 +44,94 @@ struct sockaddr_in sock_serv,clt;
 
 int main (int argc, char**argv){
     // file descriptors
-	int fd, sfd;
+	int fd, sfd, port, conn_count = 1;
 	char buffer[BUFFER];
-	off_t count=0, n; // long type
+	long long count = 0, n;
+	off_t m; // long type
 	char filename[256];
     unsigned int l=sizeof(struct sockaddr_in);
+	char * ip_address = "127.0.0.1";
 	
     // variables to save the date
 	time_t intps;
 	struct tm* tmi;
     
 	// checks there are exactly 2 arguments provided on the command line
-	if (argc != 2){
-		printf("Usage error: %s <port_serv>\n",argv[0]);
+	if(argc != 2){
+		printf("Usage error: %s [-p port_serv]\n",argv[0]);
 		return EXIT_FAILURE;
 	}
+	// checks that the port number is in the appropriate range
+	port = atoi(argv[1]);
+	if(port < 10000 || port > 59999){
+		printf("Usage error: port_serv must be between 10000-59999");
+	}
+	
 
     // calls the create server socket function, using the port address of the server 
 	// and stores the returned socket file descriptor in sfd
-    sfd = create_server_socket(atoi(argv[1]));
-    
-	intps = time(NULL);
-	// convert those seconds to a tm struct called tmi
-	tmi = localtime(&intps);
-	// assign the time info into the string filename
-	sprintf(filename,"clt.%d.%d.%d.%d.%d.%d",tmi->tm_mday,tmi->tm_mon+1,1900+tmi->tm_year,tmi->tm_hour,tmi->tm_min,tmi->tm_sec);
-	// print filename
-	printf("Creating the output file : %s\n",filename);
-    
-	// open filename (create it first) in write only mode, but make the file read/write for the user
-    // the file is opened on file descriptor fd
-	if((fd=open(filename,O_CREAT|O_WRONLY|O_TRUNC,0600))==-1){
-		perror("open fail");
-		return EXIT_FAILURE;
-	}
-    
-	// preparing to receive datagrams
-    // bzero sets all the bytes in the buffer to zero
-	bzero(buffer,BUFFER);
-    // reads BUFFER bytes from sfd into buffer and saves the source ip address and port in clt
-    n=recvfrom(sfd,buffer,BUFFER,0,(struct sockaddr *)&clt,&l);
-	// while there are bytes to read
-	while(n){
-		// print the number of bytes received
-		printf("%lld of data received \n",n);
-		if(n==-1){
-			perror("read fails");
+    sfd = create_server_socket(port);
+	printf("Listening on IP: %s and port: %d\n",ip_address,port);
+
+	// loop to accept multiple connections
+	while(1){
+		intps = time(NULL);
+		// convert those seconds to a tm struct called tmi
+		tmi = localtime(&intps);
+		// assign the time info into the string filename
+		sprintf(filename,"clt.%d.%d.%d.%d.%d.%d",tmi->tm_mday,tmi->tm_mon+1,1900+tmi->tm_year,tmi->tm_hour,tmi->tm_min,tmi->tm_sec);
+		// print filename (not used in Workshop06)
+		// printf("Creating an output file: %s\n",filename);
+		
+		// open filename (create it first) in write only mode, but make the file read/write for the user
+		// the file is opened on file descriptor fd
+		if((fd=open(filename,O_CREAT|O_WRONLY|O_TRUNC,0600))==-1){
+			perror("open fail");
 			return EXIT_FAILURE;
 		}
-		// cumulative count of bytes read and written
-		count+=n;
-        //write the bytes from buffer into the file fd
-		if((m=write(fd,buffer,n))==-1){
-			perror("write fail");
-			exit (6);
-		}
-        // clear the buffer
+		
+		// preparing to receive datagrams
+		// bzero sets all the bytes in the buffer to zero
 		bzero(buffer,BUFFER);
-        // read the next packet from the connection socket
-        n=recvfrom(sfd,&buffer,BUFFER,0,(struct sockaddr *)&clt,&l);
+		// reads BUFFER bytes from sfd into buffer and saves the source ip address and port in clt
+		n=recvfrom(sfd,buffer,BUFFER,0,(struct sockaddr *)&clt,&l);
+		// while there are bytes to read
+		while(n){
+			if(n==-1){
+				perror("read fails");
+				return EXIT_FAILURE;
+			}
+			// print the number of bytes received (not used in Workshop06)
+			// printf("%lld bytes of data received \n",n);
+			// cumulative count of bytes read and written
+			count+=n;
+			//write the bytes from buffer into the file fd
+			if((m=write(fd,buffer,n))==-1){
+				perror("write fail");
+				exit(6);
+			}
+			// clear the buffer
+			bzero(buffer,BUFFER);
+			// read the next packet from the connection socket
+			n=recvfrom(sfd,&buffer,BUFFER,0,(struct sockaddr *)&clt,&l);
+		}
+		// print the connection number and the total number of bytes received
+		printf("Connection: \"%d\", data received: \"%lld\" \n",conn_count,count);
+		
+		// close the open file
+		close(fd);
+		// sleep for 1 second
+		sleep(1);
+		conn_count++;
 	}
-    // print the number of bytes received
-	printf("Number of bytes received: %lld \n",count);
-    
-    // close the server socket and the file socket
+	// close the server socket and 
     close(sfd);
-    close(fd);
-	
+
 	return EXIT_SUCCESS;
 }
 
-/* Function to calculate the duration of the sending. */
-int duration (struct timeval *start,struct timeval *stop,struct timeval *delta)
+/* Function to calculate the duration of the transmission. */
+int duration(struct timeval *start,struct timeval *stop,struct timeval *delta)
 {
 	// these are just longs
     suseconds_t microstart, microstop, microdelta;
@@ -169,8 +185,15 @@ int create_server_socket (int port){
 
 	// sets the ip address of the sock_serv struct to all local interfaces (rather than a specific local IP address)
     // needs to have a conversion from host byte order to network byte order, which htonl does
-	sock_serv.sin_addr.s_addr=htonl(INADDR_ANY);
+	//sock_serv.sin_addr.s_addr=htonl("127.0.0.1");
     
+	// sets the ip address of the sock_serv struct to the loopback address
+	// the inet_pton function converts a character string ip address to an in_addr network address struct
+    if (inet_pton(AF_INET,"127.0.0.1",&sock_serv.sin_addr)==0){
+		printf("Invalid IP adress\n");
+		return EXIT_FAILURE;
+	}
+
 	// assign an identity (sockaddr struct) to the local socket created above
     // gives the socket an IP address interface (or in this case all interfaces) to bind to
 	if(bind(sfd,(struct sockaddr*)&sock_serv,l)==-1){

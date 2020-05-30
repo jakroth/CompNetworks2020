@@ -47,7 +47,8 @@ struct sockaddr_in sock_serv,sock_clt;
 int main(int argc,char** argv){
     int sfd,fd;
     unsigned int length=sizeof(struct sockaddr_in);
-    long int n, m,count=0;
+    long long count = 0, n;
+    long m;
     unsigned int nsid;
     ushort clt_port;
     char buffer[BUFFER],filename[256];
@@ -69,15 +70,12 @@ int main(int argc,char** argv){
     
     // bzero sets all the bytes in the buffer to zero
     bzero(buffer,BUFFER);
-    printf("position 1");
     // market the local socket as a listening/passive socket, for incoming requests (using accept)
     listen(sfd,BACKLOG);
-    printf("position 2");
     // accepts the first connection to a listening (tcp) socket, setting up another socket to receive data
     // the new socket is saved in nsid
     // adds the client ip address and port number from the connection to the client sockaddr_in struct
     nsid=accept(sfd,(struct sockaddr*)&sock_clt,&length);
-    printf("position 3");
     // check for a failed accept
     if(nsid==-1){
         perror("accept fail");
@@ -90,15 +88,12 @@ int main(int argc,char** argv){
             perror("socket error");
             exit (4);
         }
-        printf("position 4");
         // gets the sending client port number from the sockaddr_in struct and stores in clt_port
         clt_port=ntohs(sock_clt.sin_port);
         // print out the details of the client server from which the connection originated
         printf("Connection started with: %s:%d\n",dst,clt_port);
         
         // Setting up a file to save transmitted data, labelling with the current time
-        // zero the memory location of filename
-        bzero(filename,256);
         // grab the seconds since the Epoch (1970)
         intps = time(NULL);
         // convert those seconds to a tm struct called tmi
@@ -106,7 +101,7 @@ int main(int argc,char** argv){
         // assign the time info into the string filename
         sprintf(filename,"clt.%d.%d.%d.%d.%d.%d",tmi->tm_mday,tmi->tm_mon+1,1900+tmi->tm_year,tmi->tm_hour,tmi->tm_min,tmi->tm_sec);
         // print filename
-        printf("Creating the copied output file : %s\n",filename);
+        printf("Creating an output file : %s\n",filename);
         
         // open filename (create it first) in write only mode, but make the file read/write for the user
         // the file is opened on file descriptor fd
@@ -127,6 +122,8 @@ int main(int argc,char** argv){
                 perror("recv fail");
                 exit(5);
             }
+            // print the number of bytes received
+            printf("%lld bytes of data received \n",n);
             //write the bytes from buffer into the file fd
             if((m=write(fd,buffer,n))==-1){
                 perror("write fail");
@@ -148,7 +145,7 @@ int main(int argc,char** argv){
     
     // print the close of the connection and the number of bytes received
     printf("End of the connection with: %s.%d\n",dst,clt_port);
-    printf("Number of bytes received: %ld \n",count);
+    printf("Total number of bytes received: %lld \n",count);
     
     return EXIT_SUCCESS;
 }
