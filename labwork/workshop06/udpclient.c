@@ -52,7 +52,7 @@ int main (int argc, char**argv){
     
 	// checks there are exactly 4 arguments provided on the command line
 	if (argc != 4){
-		printf("Error usage : %s <ip_serv> <port_serv> <filename>\n",argv[0]);
+		printf("Usage error: %s <ip_serv> <port_serv> <filename>\n",argv[0]);
 		return EXIT_FAILURE;
 	}
     

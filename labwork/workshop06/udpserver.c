@@ -65,36 +65,52 @@ int main (int argc, char**argv){
     sfd = create_server_socket(atoi(argv[1]));
     
 	intps = time(NULL);
+	// convert those seconds to a tm struct called tmi
 	tmi = localtime(&intps);
-	bzero(filename,256);
+	// assign the time info into the string filename
 	sprintf(filename,"clt.%d.%d.%d.%d.%d.%d",tmi->tm_mday,tmi->tm_mon+1,1900+tmi->tm_year,tmi->tm_hour,tmi->tm_min,tmi->tm_sec);
+	// print filename
 	printf("Creating the output file : %s\n",filename);
     
-	//ouverture du fichier
+	// open filename (create it first) in write only mode, but make the file read/write for the user
+    // the file is opened on file descriptor fd
 	if((fd=open(filename,O_CREAT|O_WRONLY|O_TRUNC,0600))==-1){
 		perror("open fail");
 		return EXIT_FAILURE;
 	}
     
-	//preparation de l'envoie
-	bzero(&buf,BUFFER);
-    n=recvfrom(sfd,&buf,BUFFERT,0,(struct sockaddr *)&clt,&l);
+	// preparing to receive datagrams
+    // bzero sets all the bytes in the buffer to zero
+	bzero(buffer,BUFFER);
+    // reads BUFFER bytes from sfd into buffer and saves the source ip address and port in clt
+    n=recvfrom(sfd,buffer,BUFFER,0,(struct sockaddr *)&clt,&l);
+	// while there are bytes to read
 	while(n){
+		// print the number of bytes received
 		printf("%lld of data received \n",n);
 		if(n==-1){
 			perror("read fails");
 			return EXIT_FAILURE;
 		}
+		// cumulative count of bytes read and written
 		count+=n;
-		write(fd,buf,n);
-		bzero(buf,BUFFER);
-        n=recvfrom(sfd,&buf,BUFFER,0,(struct sockaddr *)&clt,&l);
+        //write the bytes from buffer into the file fd
+		if((m=write(fd,buffer,n))==-1){
+			perror("write fail");
+			exit (6);
+		}
+        // clear the buffer
+		bzero(buffer,BUFFER);
+        // read the next packet from the connection socket
+        n=recvfrom(sfd,&buffer,BUFFER,0,(struct sockaddr *)&clt,&l);
 	}
+    // print the number of bytes received
+	printf("Number of bytes received: %lld \n",count);
     
-	printf("Nombre d'octets transférés : %lld \n",count);
-    
+    // close the server socket and the file socket
     close(sfd);
     close(fd);
+	
 	return EXIT_SUCCESS;
 }
 

@@ -59,8 +59,8 @@ int main(int argc,char** argv){
 
     // checks there are exactly 2 arguments provided on the command line
     if(argc!=2) {
-        perror("Usage error: %s <port_serv>\n",argv[0]);
-        exit(3);
+        printf("Usage error: %s <port_serv>\n",argv[0]);
+        return EXIT_FAILURE;
     }
     
    	// calls the create server socket function, using the port address of the server 
@@ -107,6 +107,7 @@ int main(int argc,char** argv){
         sprintf(filename,"clt.%d.%d.%d.%d.%d.%d",tmi->tm_mday,tmi->tm_mon+1,1900+tmi->tm_year,tmi->tm_hour,tmi->tm_min,tmi->tm_sec);
         // print filename
         printf("Creating the copied output file : %s\n",filename);
+        
         // open filename (create it first) in write only mode, but make the file read/write for the user
         // the file is opened on file descriptor fd
         if ((fd=open(filename,O_CREAT|O_WRONLY,0600))==-1)
@@ -114,9 +115,9 @@ int main(int argc,char** argv){
             perror("open fail");
             exit (3);
         }
+        // preparing to receive packets
         // bzero sets all the bytes in the buffer to zero
         bzero(buffer,BUFFER);
-        
         // reads BUFFER bytes from nsid into buffer
         n=recv(nsid,buffer,BUFFER,0);
         // while there were bytes to read
@@ -172,13 +173,13 @@ int create_server_socket (int port){
 
     /* Change some socket options for the listening socket
      * SOL_SOCKET: To manipulate options at the sockets API level
-     * SO_REUSEADDR : When you have to restart a server after a hard stop this can be useful
+     * SO_REUSEADDR: When you have to restart a server after a hard stop this can be useful
      * not to have an error when creating the socket (the IP stack of the system has not
      * always had time to clean up).
      * Multiple servers listening on the same port... (?)
      */
     if(setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR,&yes,sizeof(int)) == -1 ) {
-        perror("setsockopt erreur");
+        perror("setsockopt error");
         exit(5);
     }
     
