@@ -139,7 +139,8 @@ int main (int argc, char**argv){
 		// close the open file
 		close(fd);
 		// sleep for 1 second
-		sleep(1);
+		//sleep(1);
+		sendto(sfd,"received",9,MSG_CONFIRM,(struct sockaddr*)&clt,l);
 		conn_count++;
 	}
 	// close the server socket and 

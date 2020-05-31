@@ -115,6 +115,13 @@ int main (int argc, char**argv){
 	// unlock the server by sending 0 bytes, signifying end of file
 	m=sendto(sfd,buffer,0,0,(struct sockaddr*)&sock_serv,l);
 
+	// zero the buffer	
+	bzero(buffer,BUFFER);
+
+	// wait for a response from the server, don't bother to save server details
+	n=recvfrom(sfd,buffer,BUFFER,0,NULL,NULL);
+	printf("message from server: %s\n", buffer);
+
 	// gets the end time after sending all packets
 	gettimeofday(&stop,NULL);
 	//calculates the duration of packet sending
