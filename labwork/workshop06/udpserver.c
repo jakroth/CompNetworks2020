@@ -138,8 +138,9 @@ int main (int argc, char**argv){
 		
 		// close the open file
 		close(fd);
-		// sleep for 1 second
-		//sleep(1);
+		
+		// send response to the client
+		// ref: https://www.geeksforgeeks.org/udp-server-client-implementation-c/
 		sendto(sfd,"received",9,MSG_CONFIRM,(struct sockaddr*)&clt,l);
 		conn_count++;
 	}

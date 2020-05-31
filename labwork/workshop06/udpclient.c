@@ -119,12 +119,13 @@ int main (int argc, char**argv){
 	bzero(buffer,BUFFER);
 
 	// wait for a response from the server, don't bother to save server details
+	// ref: https://www.geeksforgeeks.org/udp-server-client-implementation-c/
 	n=recvfrom(sfd,buffer,BUFFER,0,NULL,NULL);
 	printf("message from server: %s\n", buffer);
 
 	// gets the end time after sending all packets
 	gettimeofday(&stop,NULL);
-	//calculates the duration of packet sending
+	// calculates the duration of packet sending
 	duration(&start,&stop,&delta);
     
 	// print all the values from the whole process
@@ -132,6 +133,9 @@ int main (int argc, char**argv){
 	printf("From a total file size of: %lld \n",sz);
 	printf("For a total duration of: %ld.%ld secs \n",delta.tv_sec,delta.tv_usec);
     
+	// sleep for 1 second
+	sleep(1);
+
 	//close the local socket
     close(sfd);
     close(fd);
