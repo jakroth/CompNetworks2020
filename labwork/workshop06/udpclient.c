@@ -95,6 +95,7 @@ int main (int argc, char**argv){
 		// sfd is the local sending socket, buffer is where the data is, n is the size of the data in buffer to send
 		// sock_serv is the destination address, and l is the type of address of sock_serv (by it's size)/
 		// m will hold the number of bytes sent each time
+		// sendto will also bind this socket to an ip/port, automatically assigned, so can be used to recv later on
 		m=sendto(sfd,buffer,n,0,(struct sockaddr*)&sock_serv,l);
 		// check for send errors
 		if(m==-1){
