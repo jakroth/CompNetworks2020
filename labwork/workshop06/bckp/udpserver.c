@@ -44,7 +44,7 @@ struct sockaddr_in sock_serv,clt;
 
 int main (int argc, char**argv){
     // file descriptors
-	int fd, sfd, port, opt, flag = 0, conn_count = 1;
+	int fd, sfd, port, conn_count = 1;
 	char buffer[BUFFER];
 	long long count = 0, n;
 	off_t m; // long type
@@ -56,30 +56,17 @@ int main (int argc, char**argv){
 	time_t intps;
 	struct tm* tmi;
     
-	// checks there are exactly 1 or 3 arguments provided on the command line
-	if(!(argc == 3 || argc == 1)){
+	// checks there are exactly 2 arguments provided on the command line
+	if(argc != 2){
 		printf("Usage error: %s [-p port_serv]\n",argv[0]);
 		return EXIT_FAILURE;
 	}
-	while ((opt = getopt(argc, argv, "p:")) != -1){
-        switch (opt){
-        case 'p':
-			port = atoi(optarg);
-			flag = 1;
-            break;
-        case '?':
-			printf("Usage error: %s [-p port_serv]\n",argv[0]);
-            exit(EXIT_FAILURE);
-        }
-    }
-	// uses a default port if not set in the command line
-	if(flag == 0){
-		port = 23456;
-	}
 	// checks that the port number is in the appropriate range
+	port = atoi(argv[1]);
 	if(port < 10000 || port > 59999){
 		printf("Usage error: port_serv must be between 10000-59999");
 	}
+	
 
     // calls the create server socket function, using the port address of the server 
 	// and stores the returned socket file descriptor in sfd
@@ -107,7 +94,6 @@ int main (int argc, char**argv){
 		// bzero sets all the bytes in the buffer to zero
 		bzero(buffer,BUFFER);
 		// reads BUFFER bytes from sfd into buffer and saves the source ip address and port in clt
-		// waits on recvfrom until datagram is received
 		n=recvfrom(sfd,buffer,BUFFER,0,(struct sockaddr *)&clt,&l);
 		// while there are bytes to read
 		while(n){
@@ -127,14 +113,10 @@ int main (int argc, char**argv){
 			// clear the buffer
 			bzero(buffer,BUFFER);
 			// read the next packet from the connection socket
-			// continues until there is nothing else on the listening socket
 			n=recvfrom(sfd,&buffer,BUFFER,0,(struct sockaddr *)&clt,&l);
 		}
-		// get the IP address from the clt connection
-		char clt_ip[20];
-		inet_ntop(AF_INET,&clt.sin_addr, clt_ip, 20);
-		// print the connection number, total number of bytes received, IP address and port number of client
-		printf("Connection: \"%d\", data received: \"%lld\", from IP: \"%s\", on port: \"%d\" \n",conn_count,count,clt_ip,clt.sin_port);
+		// print the connection number and the total number of bytes received
+		printf("Connection: \"%d\", data received: \"%lld\" \n",conn_count,count);
 		
 		// close the open file
 		close(fd);

@@ -1,11 +1,3 @@
-WORKSHOP 6                        ENGR9881 - Computer Networks
-Name: Joel Pillar-Rogers
-FAN: pill0032
-Date: 30/05/2020
-
-
-MAKEFILE:
-******* Makefile *******
 # 
 # File : Makefile
 # Author: Joel Pillar-Rogers
@@ -56,7 +48,7 @@ ${A_UDPSRV}: ${C_UDPSRV}
 	$(CC) $(CFLAGS) -o ${A_UDPSRV} ${C_UDPSRV}
 
 clean:
-	-rm -fv ${OFILES} ${A_TCPCLT} ${A_TCPSRV} ${A_UDPCLT} ${A_UDPSRV} *~
+	-rm -fv ${OFILES} ${A_TCPCLT} ${A_TCPSRV} ${A_UDPCLT} ${A_UDPSRV} *~ clt.*
                  
 proper: clean all
 
@@ -64,31 +56,7 @@ proper: clean all
 #so .PHONY means the makefile will always run them, won't check to see if there's a file that needs to be updated
 .PHONY: all clean proper  
 
-# fin du Makefile (left in some French :))
-
-
-
-
-
-TASK 1:
-******* Source Code *******
-
-
-
-******* CLI Output *******
-
-
-
-
-TASK 2:
-******* Source Code *******
-
-
-
-******* CLI Output *******
-
-
-
+# fin du Makefile
 
 
 

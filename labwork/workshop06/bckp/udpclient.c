@@ -53,7 +53,7 @@ int main (int argc, char**argv){
     
 	// checks there are exactly 4 arguments provided on the command line
 	if (argc != 4){
-		printf("Usage error: %s <ip_serv> <port_serv> \n",argv[0]);
+		printf("Usage error: %s <ip_serv> <port_serv> <filename>\n",argv[0]);
 		return EXIT_FAILURE;
 	}
     
@@ -112,7 +112,8 @@ int main (int argc, char**argv){
 	}
 	// read has returned 0 = end of file
 	
-	// unlock the server by sending 0 bytes, signifying end of file
+	// original comment said this is "to unlock the server" - not sure why it does that. may be something on the server side
+	// sends 0 bytes to the server
 	m=sendto(sfd,buffer,0,0,(struct sockaddr*)&sock_serv,l);
 
 	// gets the end time after sending all packets
