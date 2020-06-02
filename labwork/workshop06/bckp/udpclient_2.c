@@ -28,7 +28,8 @@
 #include <unistd.h>
 #include <strings.h>
 
-/* Buffer size used to send the file in several blocks */
+/* Buffer size used to send the file in several blocks
+ */
 #define BUFFER 512
 
 /* Command to generate a test file (uses Linux' built in randomiser and the dd command)
@@ -101,6 +102,7 @@ int main (int argc, char**argv){
 
 		// calls the create local socket function, using the port and ip address of the destination server 
 		// stores the returned file descriptor in sfd
+		// Note, that getopt reorders argv, so 4 and 3 are the correct arguments here
 		sfd=create_client_socket(port, ipaddr);
 		printf("******Pinging %s:%d*******\n",ipaddr,port);
 
@@ -161,8 +163,9 @@ int main (int argc, char**argv){
 		// zero the buffer	
 		bzero(buffer,BUFFER);
 
-		// wait for a response from the server
-		// reads BUFFER bytes from sfd into buffer, don't bother to save server details (don't need them)
+		// wait for a response from the server, don't bother to save server details
+		// reads BUFFER bytes from sfd into buffer and saves the source ip address and port in clt
+		// waits on recvfrom until datagram is received
 		// ref: https://www.geeksforgeeks.org/udp-server-client-implementation-c/
 		n=recvfrom(sfd,buffer,BUFFER,0,NULL,NULL);
 		printf("Message from server: %s\n", buffer);
