@@ -61,7 +61,7 @@ proper: clean all
 #so .PHONY means the makefile will always run them, won't check to see if there's a file that needs to be updated
 .PHONY: all clean proper tcp udp test
 
-# fin du Makefile
+# fin du Makefile (left in some French :))
 
 
 

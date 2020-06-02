@@ -414,6 +414,7 @@ int main(int argc, char **argv)
 	out = dup(1); /* keep a hold of stdout, for our own purposes */
 	if (out < 0)
 		ctap_bail("failed to dup stdout: %s", strerror(errno));
+	//note("out: %d",out);
 
 #ifdef _WIN32
 	char nullpath[] = "NUL";
@@ -423,15 +424,22 @@ int main(int argc, char **argv)
 	nul = open(nullpath, O_WRONLY);
 	if (nul < 0)
 		ctap_bail("failed to open %s: %s", nullpath, strerror(errno));
+	//note("nul: %d",nul);
 
 	CTAP.priv_stdout = fdopen(out, "w");
+	//note("ctap: %d",CTAP.priv_stdout->_fileno);
+
+	//note("message0");
 	if (!CTAP.priv_stdout)
 		ctap_bail("failed to fdopen stdout: %s", strerror(errno));
 
+	//note("message1");
 	if (dup2(nul, 1) < 0)
 		ctap_bail("failed to redirect stdout to %s: %s", nullpath, strerror(errno));
 
+	//note("message2");
 	no_plan();
+	//note("message3");
 	ctap_tests();
 	done_testing();
 	return 0;

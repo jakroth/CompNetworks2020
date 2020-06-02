@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Time function, sockets, htons... file stat
+// Time function, sockets, htons, file stat
 #include <sys/time.h>
 #include <time.h>
 #include <sys/socket.h>
@@ -31,13 +31,10 @@
 /* Buffer size used to send the file in several blocks */
 #define BUFFER 512
 
-/* Command to generate a test file (uses Linux' built in randomiser and the dd command)
- * dd if=/dev/urandom of=testfile count=8
- */
-
 /* Declaration of functions*/
 int create_client_socket (int port, char* ipaddr);
 
+// Struct to hold details about the server socket 
 struct sockaddr_in sock_serv;
 
 int main (int argc, char**argv){
@@ -50,12 +47,13 @@ int main (int argc, char**argv){
     int l=sizeof(struct sockaddr_in);
 	struct stat filestat;
 	time_t t;
-    
+
 	// checks there are exactly 3 or 5 arguments provided on the command line
 	if(!(argc == 3 || argc == 5)){
 		printf("Usage error: %s <ip_serv> <port_serv> [-f file]\n",argv[0]);
 		return EXIT_FAILURE;
 	}
+	// assigns the ip address and port number before getopt messes with them
 	ipaddr = argv[1];
 	port = atoi(argv[2]);
 
@@ -99,10 +97,14 @@ int main (int argc, char**argv){
 			return EXIT_FAILURE;
 		}
 
+		printf("******Pinging %s:%d*******\n",ipaddr,port);
 		// calls the create local socket function, using the port and ip address of the destination server 
 		// stores the returned file descriptor in sfd
 		sfd=create_client_socket(port, ipaddr);
-		printf("******Pinging %s:%d*******\n",ipaddr,port);
+		printf("%d\n",stdout->_fileno);
+		printf("%d\n",stderr->_fileno);
+		printf("%d\n",fd);
+		printf("%d\n",sfd);
 
 		// bzero sets all the bytes in the buffer to zero
 		bzero(buffer,BUFFER);

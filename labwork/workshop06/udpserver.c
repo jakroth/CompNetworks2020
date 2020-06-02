@@ -6,7 +6,7 @@
  * Acknowledgment: adapted from a project by Amine Amanzou 
  * https://github.com/amineamanzou/UDP-TCP-File-Transfer
  * 
- * Created on 20 May 2020
+ * Created on 30 May 2020
  *
  * Under GNU Licence
  */
@@ -73,12 +73,11 @@ int main (int argc, char**argv){
 		port = 23456;
 	}
 
-	// checks that the port number is in the appropriate range
+	// checks that the port number is in the appropriate range, ports above 1024 can be accessed in user space
 	if(port < 10000 || port > 59999){
 		printf("Usage error: port_serv must be between 10000-59999");
 	}
 
-    
 	printf("Listening on IP: %s and port: %d\n",ip_address,port);
 
 	// loop to accept multiple connections
@@ -87,13 +86,12 @@ int main (int argc, char**argv){
 		// and stores the returned socket file descriptor in sfd
 		sfd = create_server_socket(port, ip_address);
 
+		// grab the current time
 		intps = time(NULL);
 		// convert those seconds to a tm struct called tmi
 		tmi = localtime(&intps);
-		// assign the time info into the string filename
+		// assign the time info into the string filename, this creates a unique filename for every connection
 		sprintf(filename,"clt.%d.%d.%d.%d.%d.%d",tmi->tm_mday,tmi->tm_mon+1,1900+tmi->tm_year,tmi->tm_hour,tmi->tm_min,tmi->tm_sec);
-		// print filename (not used in Workshop06)
-		// printf("Creating an output file: %s\n",filename);
 		
 		// open filename (create it first) in write only mode, but make the file read/write for the user
 		// the file is opened on file descriptor fd
@@ -102,7 +100,7 @@ int main (int argc, char**argv){
 			return EXIT_FAILURE;
 		}
 		
-		// preparing to receive datagrams
+		// ***preparing to receive datagrams
 		// bzero sets all the bytes in the buffer to zero
 		bzero(buffer,BUFFER);
 
@@ -116,12 +114,10 @@ int main (int argc, char**argv){
 				perror("read fails");
 				return EXIT_FAILURE;
 			}
-			// print the number of bytes received
-			// printf("%lld bytes of data received \n",n);
 			// cumulative count of bytes read and written
 			count+=n;
 
-			//write the bytes from buffer into the file fd
+			//write the bytes from buffer into the unique file for this connection
 			if((m=write(fd,buffer,n))==-1){
 				perror("write fail");
 				exit(6);
@@ -133,13 +129,6 @@ int main (int argc, char**argv){
 			// continues until there is nothing else on the listening socket
 			n=recvfrom(sfd,&buffer,BUFFER,0,(struct sockaddr *)&clt,&l);
 		}
-		// get the IP address from the clt connection
-		char clt_ip[20];
-		inet_ntop(AF_INET,&clt.sin_addr, clt_ip, 20);
-
-		// print the connection number, total number of bytes received, IP address and port number of client
-		printf("Connection: \"%d\", bytes received: \"%lld\", from IP: \"%s\", on port: \"%d\" \n",conn_count,count,clt_ip,clt.sin_port);
-		
 		// close the open file
 		close(fd);
 
@@ -155,17 +144,27 @@ int main (int argc, char**argv){
 		// reads the first 512 bytes from the file into the buffer
 		read(fd,buffer,BUFFER);
 
-		// convert the first 512 bytes into a string, with a short preceding message, so it can be sent to the client 
-		sprintf(rtn_string,"data received: \"%s\"",buffer);
+		// convert the first 512 bytes into a string so it can be sent to the client 
+		sprintf(rtn_string,"%s",buffer);
 
 		// send the first 512 bytes as a response to the client
 		// ref: https://www.geeksforgeeks.org/udp-server-client-implementation-c/
 		sendto(sfd,rtn_string,sizeof(rtn_string),MSG_CONFIRM,(struct sockaddr*)&clt,l);
-		conn_count++;
-		count = 0;
 
 		// close the server socket 
 		close(sfd);
+
+		// get the IP address from the clt connection
+		// need to convert from an in_addr network address struct to a character string 
+		char clt_ip[20];
+		inet_ntop(AF_INET,&clt.sin_addr, clt_ip, 20);
+
+		// print the connection number, total number of bytes received, IP address and port number of client
+		printf("Connection: \"%d\", data received: \"%s\", from IP: \"%s\", on port: \"%d\" \n",conn_count,rtn_string,clt_ip,clt.sin_port);
+
+		// reset the data counter and connection loop counter
+		conn_count++;
+		count = 0;
 
 		// sleep for 1 second to make sure the server is ready to receive the next connections
 		sleep(1);
