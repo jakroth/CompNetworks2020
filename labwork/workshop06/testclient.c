@@ -55,8 +55,8 @@ TESTS{
 	char * ipaddr = "127.0.0.1";
     // variables to hold the message and return message (will be a random 8 numbers)
     long message = 0;
-    char *message_str = "";
-    char rtn_message[50];
+    char message_str[10];
+    char rtn_message[10];
     // for holding the number of bytes transmitted and received
     off_t m; 
 
@@ -68,13 +68,13 @@ TESTS{
     // stores the returned file descriptor in sfd
 	ok(sfd=create_client_socket(port, ipaddr, &sock_serv) >= 0, "create the client socket; also populate the server destination struct");
 	diag("******Pinging %s:%d*******",ipaddr,port);
+    diag("%d",sfd);
 
 	// initialise random number generator, using the start time
     // this will create a different random seed each time
 	srand((unsigned)time(&(start.tv_sec)));
     // obtain a random number (range 10,000,000 to 99,999,999)
     message = rand() % 90000000 + 10000000; 
-    diag("%ld",message);
     sprintf(message_str,"%ld",message);
 
     // print the message
@@ -85,7 +85,18 @@ TESTS{
     // sock_serv is the destination address, and l is the type of address of sock_serv (by it's size)
     // m will hold the number of bytes sent each time
     // sendto will also bind this socket to an ip/port, automatically assigned, which will be used to receive messages later on
+    diag("%d", ntohs(sock_serv.sin_port));
+    char str[50];
+
+	if (inet_ntop(AF_INET, &sock_serv.sin_addr, str, INET_ADDRSTRLEN) == NULL) {
+			perror("inet_ntop");
+			exit(EXIT_FAILURE);
+	}
+
+    diag("%s",str);
+
     ok(m=sendto(sfd,message_str,sizeof(message_str),0,(struct sockaddr*)&sock_serv,l) > 0, "sent the message to the server");
+    diag("%ld",m);
 
     // unlock the server by sending 0 bytes, signifying end of file
 	ok(m=sendto(sfd,NULL,0,0,(struct sockaddr*)&sock_serv,l) == 0, "message to unlock the server, indicating last datagram");
@@ -96,7 +107,7 @@ TESTS{
     ok(m=recvfrom(sfd,rtn_message,8,0,NULL,NULL) == 8, "received return message from server");
 
     // check that the returned string matches the transmitted string
-    is(message_str,rtn_message,"Return data matches sent data");
+    is(rtn_message,message_str,"Return data matches sent data");
 
     // print the return message
     diag("Message from server: %s\n", rtn_message);
@@ -119,6 +130,8 @@ TESTS{
 int create_client_socket (int port, char* ipaddr, struct sockaddr_in * sock_serv){
     int l;
 	int sfd;
+    int nfd;
+    int nnfd;
     // *****setting up the local socket
 	// uses the ip4 address family and the UDP connectionless sock datagram (and the default protocol, 0)
 	// assigns a file descriptor integer to sfd, for use in main
@@ -127,9 +140,22 @@ int create_client_socket (int port, char* ipaddr, struct sockaddr_in * sock_serv
         perror("socket fail");
         return EXIT_FAILURE;
 	}
+
+	nfd = socket(AF_INET,SOCK_DGRAM,0);
+	if (nfd == -1){
+        perror("socket fail");
+        return EXIT_FAILURE;
+	}
+
+	nnfd = socket(AF_INET,SOCK_DGRAM,0);
+	if (nnfd == -1){
+        perror("socket fail");
+        return EXIT_FAILURE;
+	}
+    
     
 	// *****preparing the destination socket address
-	// finds the size of a sockadd_in struct
+	// finds the size of a sockaddr_in struct
 	l=sizeof(struct sockaddr_in);
 	// zeroes the struct so no info is hanging around
 	bzero(sock_serv,l);
@@ -152,7 +178,7 @@ int create_client_socket (int port, char* ipaddr, struct sockaddr_in * sock_serv
     sock_serv->sin_addr = temp;
     
 	// return the file descriptor number of the local socket
-    return sfd;
+    return nnfd;
 }
 
 
