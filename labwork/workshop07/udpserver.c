@@ -76,10 +76,18 @@ int main (int argc, char**argv){
 
 	// checks that the port number is in the appropriate range, ports above 1024 can be accessed in user space
 	if(port < 10000 || port > 59999){
-		printf("Usage error: port_serv must be between 10000-59999");
+		printf("Usage error: port_serv must be between 10000-59999\n");
+		return EXIT_FAILURE;
 	}
 
 	printf("Listening on IP: %s and port: %d\n",ip_address,port);
+
+
+
+
+
+
+
 
 	// loop to accept multiple connections
 	while(1){
@@ -218,8 +226,9 @@ int create_server_socket (int port, char *ipaddr){
 		return EXIT_FAILURE;
 	}
 
-	// assign an identity (sockaddr struct) to the local socket created above
-    // gives the socket an IP address and port interface to bind to, on which it will listen for incoming datagrams
+	// assign an identity (sockaddr_in struct) to the local socket created above
+    // gives the socket an IP address and port interface to bind to, 
+	// on which it will listen for incoming datagrams
 	if(bind(sfd,(struct sockaddr*)&sock_serv,l)==-1){
 		perror("bind fail");
 		return EXIT_FAILURE;

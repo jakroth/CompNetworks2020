@@ -4,8 +4,9 @@
 # Acknowledgment: adapted from a makefile by Amine Amanzou 
 # https://github.com/amineamanzou/UDP-TCP-File-Transfer
 #
-## Created on 13 June 2020
 #
+# Created on 20 May 2020
+# Updated on 13 June 2020
 #
 #
 

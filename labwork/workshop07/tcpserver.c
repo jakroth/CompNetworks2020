@@ -34,139 +34,243 @@
 /* Client queue size*/
 #define BACKLOG 1
 
-/* Command to generate a test file (uses Linux' built in randomiser and the dd command)
- * dd if=/dev/urandom of=fichier count=8
- */
-
 /* Declaration of functions*/
-int duration (struct timeval *start,struct timeval *stop, struct timeval *delta);
-int create_server_socket (int port);
+int create_server_socket (int port, char *ipaddr);
 
 // Structs to hold details about the server and client socket details
 struct sockaddr_in sock_serv,sock_clt;
 
 int main(int argc,char** argv){
-    int sfd,fd;
+    // file descriptors
+	int fd, sfd, port, opt, flag = 0, conn_count = 1;
+	long long count = 0, n, sz = 0;
+	off_t m; // long type
+	char buffer[BUFFER], filename[BUFFER], rtn_string[BUFFER];
     unsigned int length=sizeof(struct sockaddr_in);
-    long long count = 0, n;
-    long m;
+	char *ip_address = "127.0.0.1";
     unsigned int nsid;
     ushort clt_port;
-    char buffer[BUFFER],filename[256];
-    char dst[INET_ADDRSTRLEN];
-    
-    // variables to save the date
-	time_t intps;
-	struct tm* tmi;
+    char clt_ip[INET_ADDRSTRLEN];
+    char *status = "OK";
+	struct stat filestat;
 
-    // checks there are exactly 2 arguments provided on the command line
-    if(argc!=2) {
-        printf("Usage error: %s <port_serv>\n",argv[0]);
-        return EXIT_FAILURE;
+	// checks there are exactly 1 or 3 arguments provided on the command line
+	if(!(argc == 3 || argc == 1)){
+		printf("Usage error: %s [-p port_serv]\n",argv[0]);
+		return EXIT_FAILURE;
+	}
+	// check to see if a port number was specified. if not, use 23456.
+	while ((opt = getopt(argc, argv, "p:")) != -1){
+        switch (opt){
+        case 'p':
+			port = atoi(optarg);
+			flag = 1;
+            break;
+        case '?':
+			printf("Usage error: %s [-p port_serv]\n",argv[0]);
+            exit(EXIT_FAILURE);
+        }
     }
+	// uses a default port if not set in the command line
+	if(flag == 0){
+		port = 45678;
+	}
+
+	// checks that the port number is in the appropriate range, ports above 1024 can be accessed in user space
+	if(port < 40000 || port > 59999){
+		printf("Usage error: port_serv must be between 10000-59999\n");
+		return EXIT_FAILURE;
+	}
+
+	printf("Listening on IP: %s and port: %d\n",ip_address,port);
     
-   	// calls the create server socket function, using the port address of the server 
-	// and stores the returned socket file descriptor in sfd
-    sfd = create_server_socket(atoi(argv[1]));
-    
-    // bzero sets all the bytes in the buffer to zero
-    bzero(buffer,BUFFER);
-    // market the local socket as a listening/passive socket, for incoming requests (using accept)
-    listen(sfd,BACKLOG);
-    // accepts the first connection to a listening (tcp) socket, setting up another socket to receive data
-    // the new socket is saved in nsid
-    // adds the client ip address and port number from the connection to the client sockaddr_in struct
-    nsid=accept(sfd,(struct sockaddr*)&sock_clt,&length);
-    // check for a failed accept
-    if(nsid==-1){
-        perror("accept fail");
-        return EXIT_FAILURE;
-    }
-    else {
-        // converts the ip address of the sending client server from the network address sockaddr_in struct and stores in the dst buffer
-	    // the inet_pton function converts a character string ip address to an in_addr network address struct 
-        if(inet_ntop(AF_INET,&sock_clt.sin_addr,dst,INET_ADDRSTRLEN)==NULL){
+
+	// loop to accept multiple connections
+	while(1){
+
+        // calls the create server socket function, using the port address of the server 
+        // and stores the returned socket file descriptor in sfd
+        sfd = create_server_socket(port, ip_address);
+
+        // mark the local socket as a listening/passive socket, waiting for incoming requests (using accept)
+        listen(sfd,BACKLOG);
+
+        // program waits here and accepts the first connection to a listening (tcp) socket, 
+        // setting up another socket to receive data
+        // the new socket is saved in nsid
+        // adds the client ip address and port number from the connection to the client sockaddr_in struct
+        nsid=accept(sfd,(struct sockaddr*)&sock_clt,&length);
+
+        // check for a failed accept
+        if(nsid==-1){
+            perror("accept fail");
+            return EXIT_FAILURE;
+        }
+        
+        // gets the sending client ip address from the sockaddr_in struct and stores it in clt_ip
+        // the inet_ntop function converts an in_addr network address struct to a character string ip address
+        if(inet_ntop(AF_INET,&sock_clt.sin_addr,clt_ip,INET_ADDRSTRLEN)==NULL){
             perror("socket error");
-            exit (4);
+            exit(4);
         }
-        // gets the sending client port number from the sockaddr_in struct and stores in clt_port
+        // gets the sending client port number from the sockaddr_in struct and stores it in clt_port
         clt_port=ntohs(sock_clt.sin_port);
-        // print out the details of the client server from which the connection originated
-        printf("Connection started with: %s:%d\n",dst,clt_port);
-        
-        // Setting up a file to save transmitted data, labelling with the current time
-        // grab the seconds since the Epoch (1970)
-        intps = time(NULL);
-        // convert those seconds to a tm struct called tmi
-        tmi = localtime(&intps);
-        // assign the time info into the string filename
-        sprintf(filename,"clt.%d.%d.%d.%d.%d.%d",tmi->tm_mday,tmi->tm_mon+1,1900+tmi->tm_year,tmi->tm_hour,tmi->tm_min,tmi->tm_sec);
-        // print filename
-        printf("Creating an output file : %s\n",filename);
-        
-        // open filename (create it first) in write only mode, but make the file read/write for the user
-        // the file is opened on file descriptor fd
-        if ((fd=open(filename,O_CREAT|O_WRONLY,0600))==-1)
-        {
-            perror("open fail");
-            exit (3);
+
+
+        // ***preparing to receive packets
+        // bzero sets all the bytes in the filename to zero
+        bzero(filename,BUFFER);
+
+        // reads BUFFER bytes from nsid into filename
+        // this should now contain the name of the file requested by the client
+        n=recv(nsid,filename,BUFFER,0);
+        if(n==-1){
+            perror("receive filename error");
+            return EXIT_FAILURE;
         }
-        // preparing to receive packets
-        // bzero sets all the bytes in the buffer to zero
-        bzero(buffer,BUFFER);
-        // reads BUFFER bytes from nsid into buffer
-        n=recv(nsid,buffer,BUFFER,0);
-        // while there were bytes to read
-        while(n) {
-            // error check
-            if(n==-1){
-                perror("recv fail");
-                exit(5);
-            }
-            // print the number of bytes received
-            printf("%lld bytes of data received \n",n);
-            //write the bytes from buffer into the file fd
-            if((m=write(fd,buffer,n))==-1){
-                perror("write fail");
-                exit (6);
-            }
-            // cumulative count of bytes read and written
-            count=count+m;
-            // clear the buffer
+
+        // opens the file containing the text to be sent
+        // if unsuccessful, sets status to Failed
+        if((fd = open(filename,O_RDONLY))==-1){
+            status = "Failed";
+        }
+        
+        // obtains information about the input file and saves it in a stat struct
+        // sets the file size variable from the struct
+        if(stat(filename,&filestat)==-1){
+            sz = 0;
+        }
+        else{
+            sz=filestat.st_size;
+        }
+
+        // convert the filename and file size into a single string to be returned
+        sprintf(rtn_string,"%s:%lld",filename,sz);
+        printf("%s",rtn_string);
+
+        // return the filename and size of the requested file to the client
+        // nsid is the server side socket of the connection, rtn_string is the data to send
+        // because this socket is in a connected state, don't need to specify sendto address
+        m=send(nsid,rtn_string,sizeof(rtn_string),0);
+        if(m==-1){
+            perror("send filename confirmation error");
+            return EXIT_FAILURE;
+        }
+
+        // *** will only continue from here if the file exists
+        if(sz != 0){
+            // bzero sets all the bytes in the buffer to zero
             bzero(buffer,BUFFER);
-            // read the next packet from the connection socket
+
+            // reads BUFFER bytes from nsid into buffer
+            // this should now contain the size of the file requested by the client, as returned by the client
             n=recv(nsid,buffer,BUFFER,0);
+            if(n==-1){
+                perror("receive filesize confirmation error");
+                return EXIT_FAILURE;
+            }
+
+            // check that the filesize returned from the client matches the actual filesize
+            if(atoll(buffer) != sz){
+                perror("filesize mismatch from client");
+                return EXIT_FAILURE;
+            } 
+
+
+            // *** start sending the file to the client, as all checks passed to this point
+            // bzero sets all the bytes in the buffer to zero
+            bzero(buffer,BUFFER);  
+
+            // read data from the local file
+            n=read(fd,buffer,BUFFER);
+            // continue sending data in 1 BUFFER at a time, until all sent
+            while(n){
+                // check for read errors
+                if(n==-1){
+                    perror("file read fail");
+                    return EXIT_FAILURE;
+                }
+                // send the buffer of data to the client server, via the local nsid socket
+                // m will hold the number of bytes sent each time
+                m=send(nsid,buffer,n,0);
+                if(m==-1){
+                    perror("payload send error");
+                    return EXIT_FAILURE;
+                }
+                // add to the total bytes sent
+                count+=m;
+                // print what's in the buffer for this read
+                // fprintf(stdout,"----\n%s\n----\n",buffer);
+                // zero everything in the buffer
+                bzero(buffer,BUFFER);
+                // read the next section of the file into the buffer
+                n=read(fd,buffer,BUFFER);
+            }
+            // read has returned 0 = end of file
+       
+            // unlock the client by sending 0 bytes, signifying end of file
+            send(nsid,buffer,0,0);
+            
+
+            // *** check that the client received all the data properly
+            // bzero sets all the bytes in the buffer to zero
+            bzero(buffer,BUFFER);
+
+            // reads BUFFER bytes from nsid into buffer
+            // this will contain "OK" if client received all data properly, otherwise "Failed"
+            n=recv(nsid,buffer,BUFFER,0);
+            if(n==-1){
+                perror("receive payload confirmation error");
+                return EXIT_FAILURE;
+            }
+
+            // set status to the final message received from the client
+            status = buffer;
         }
         // close the listening socket and the file socket
         close(sfd);
         close(fd);
+        
+        // close the connection socket
+        close(nsid);
+
+		// print the connection number, connection ip and port, file retrieved, file size and status, IP address and port number of client
+		printf("Connection: \"%d\", from Client: \"%s:%d\", file: \"%s\", size: \"%lld\", status: \"%s\"\n",conn_count,clt_ip,clt_port,rtn_string,sz,status);
+
+		// reset the data counter and connection loop counter
+		conn_count++;
+		count = 0;
+
+        // reset the file size
+        sz = 0;
+        
+		// sleep for 1 second to make sure the server is ready to receive the next connections
+		sleep(1);
+
     }
-    // close the connection socket
-    close(nsid);
-    
-    // print the close of the connection and the number of bytes received
-    printf("End of the connection with: %s.%d\n",dst,clt_port);
-    printf("Total number of bytes received: %lld \n",count);
     
     return EXIT_SUCCESS;
 }
+
+
 
 /* Function allowing the creation of a socket and its attachment to the system
  * Returns a file descriptor in the process descriptor table
  * bind() allows its definition with the system
  */
-int create_server_socket (int port){
+int create_server_socket (int port, char *ipaddr){
     int l;
 	int sfd;
     int yes=1;
 
     // *****setting up the local socket
+    // this sets up a socket, the first step in allowing a connection
 	// uses the ip4 address family and the TCP connection-oriented sock stream (and the default protocol, 0)
 	// assigns a file descriptor integer to sfd, for use in main
 	sfd = socket(AF_INET,SOCK_STREAM,0);
 	if (sfd == -1){
         perror("socket fail");
-        return EXIT_SUCCESS;
+        return EXIT_FAILURE;
 	}
 
     /* Change some socket options for the listening socket
@@ -174,7 +278,6 @@ int create_server_socket (int port){
      * SO_REUSEADDR: When you have to restart a server after a hard stop this can be useful
      * not to have an error when creating the socket (the IP stack of the system has not
      * always had time to clean up).
-     * Multiple servers listening on the same port... (?)
      */
     if(setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR,&yes,sizeof(int)) == -1 ) {
         perror("setsockopt error");
@@ -195,12 +298,21 @@ int create_server_socket (int port){
 	// needs to have a conversion from host byte order to network byte order, which htons does
 	sock_serv.sin_port=htons(port);
 
-    // sets the ip address of the sock_serv struct to all local interfaces (rather than a specific local IP address)
+	// *** currently not used ***
+	// sets the ip address of the sock_serv struct to all local interfaces (rather than a specific local IP address)
     // needs to have a conversion from host byte order to network byte order, which htonl does
-    sock_serv.sin_addr.s_addr=htonl(INADDR_ANY);
+	//sock_serv.sin_addr.s_addr=htonl(INADDR_ANY);
     
-	// assign an identity (sockaddr struct) to the local socket created above
-    // gives the socket an IP address interface (or in this case all interfaces) to bind to
+	// sets the ip address of the sock_serv struct to the loopback address
+	// the inet_pton function converts a character string ip address to an in_addr network address struct
+    if (inet_pton(AF_INET,ipaddr,&sock_serv.sin_addr)==0){
+		printf("Invalid IP adress\n");
+		return EXIT_FAILURE;
+	}
+
+	// assign the identity (sockaddr_in struct) to the local socket created above
+    // gives the socket an IP address and port interface to bind to, 
+    // on which it will listen for incoming connections/packets
 	if(bind(sfd,(struct sockaddr*)&sock_serv,l)==-1){
 		perror("bind fail");
 		return EXIT_FAILURE;

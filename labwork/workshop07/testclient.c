@@ -48,7 +48,7 @@ TESTS{
     // variable for the socket file descriptor
     int sfd;
     // int and char * for storing the destination server details
-    int port = 23456;
+    int port = 45678;
 	char * ipaddr = "127.0.0.1";
     // variables to hold the message and return message (will be a random 8 numbers)
     long message = 0;
