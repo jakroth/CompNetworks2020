@@ -39,7 +39,7 @@ int setup_server_socket (int port, char* ipaddr, struct sockaddr_in *sock_serv);
 
 TESTS{  
     /* Declaration of structures and variables */
-    // Struct to hold time details for timing the ping
+    // Struct to hold time details for timing the http request
     struct timeval start, stop, delta;
     // Struct to hold details about the destination server socket 
     struct sockaddr_in sock_serv;
@@ -51,9 +51,9 @@ TESTS{
     int port = 45678;
 	char * ipaddr = "127.0.0.1";
     // variables to hold the message and return message (will be a random 8 numbers)
-    long message = 0;
-    char message_str[10];
-    char rtn_message[10];
+    //long message = 0;
+    //char message_str[10];
+    //char rtn_message[10];
     // for holding the number of bytes transmitted and received
     off_t m; 
 
@@ -61,9 +61,9 @@ TESTS{
 	ok(gettimeofday(&start,NULL) == 0, "get the start time");
 
     // setting up the local socket
-	// uses the ip4 address family and the UDP connectionless sock datagram (and the default protocol, 0)
+	// uses the ip4 address family and the TCP connection-oriented sock stream (and the default protocol, 0)
 	// assigns a file descriptor integer to sfd, for sending out later on
-    sfd = socket(AF_INET,SOCK_DGRAM,0);
+    sfd = socket(AF_INET,SOCK_STREAM,0);
 	ok(sfd >= 0, "setup the local socket");    
 
     // calls the setup server socket function, using the port and ip address of the destination server 
