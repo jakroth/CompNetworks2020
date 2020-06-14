@@ -82,13 +82,6 @@ int main (int argc, char**argv){
 
 	printf("Listening on IP: %s and port: %d\n",ip_address,port);
 
-
-
-
-
-
-
-
 	// loop to accept multiple connections
 	while(1){
 		// calls the create server socket function, using the port address of the server 

@@ -144,11 +144,12 @@ int main(int argc,char** argv){
             sz=filestat.st_size;
         }
 
-        // convert the filename and file size into a single string to be returned
+        // convert the filename and file size into a single string, sepaarated by a colon, to be returned
         sprintf(rtn_string,"%s:%lld",filename,sz);
         printf("%s",rtn_string);
 
         // return the filename and size of the requested file to the client
+        // if the requested file doesn't exist, this will be the non-existant file name and 0 bytes for size
         // nsid is the server side socket of the connection, rtn_string is the data to send
         // because this socket is in a connected state, don't need to specify sendto address
         m=send(nsid,rtn_string,sizeof(rtn_string),0);
