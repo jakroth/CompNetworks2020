@@ -45,7 +45,7 @@ int main(int argc,char** argv){
 	int fd, sfd, port, opt, flag = 0, conn_count = 1;
 	long long count = 0, n, sz = 0;
 	off_t m; // long type
-	char buffer[BUFFER], filename[BUFFER], rtn_string[BUFFER];
+	char buffer[BUFFER], filename[BUFFER], rtn_string[64];
     unsigned int length=sizeof(struct sockaddr_in);
 	char *ip_address = "127.0.0.1";
     unsigned int nsid;
@@ -144,9 +144,9 @@ int main(int argc,char** argv){
             sz=filestat.st_size;
         }
 
-        // convert the filename and file size into a single string, sepaarated by a colon, to be returned
+        // convert the filename and file size into a single string, separated by a colon, to be returned
         sprintf(rtn_string,"%s:%lld",filename,sz);
-        printf("%s",rtn_string);
+        //printf("%s\n",rtn_string);
 
         // return the filename and size of the requested file to the client
         // if the requested file doesn't exist, this will be the non-existant file name and 0 bytes for size
@@ -163,6 +163,7 @@ int main(int argc,char** argv){
             // bzero sets all the bytes in the buffer to zero
             bzero(buffer,BUFFER);
 
+            // grab the confirmation file size from the client
             // reads BUFFER bytes from nsid into buffer
             // this should now contain the size of the file requested by the client, as returned by the client
             n=recv(nsid,buffer,BUFFER,0);
@@ -177,22 +178,24 @@ int main(int argc,char** argv){
                 return EXIT_FAILURE;
             } 
 
-
             // *** start sending the file to the client, as all checks passed to this point
             // bzero sets all the bytes in the buffer to zero
             bzero(buffer,BUFFER);  
 
             // read data from the local file
             n=read(fd,buffer,BUFFER);
-            // continue sending data in 1 BUFFER at a time, until all sent
-            while(n){
+            // continue sending data one BUFFER at a time, until all sent
+            while(n>0){
                 // check for read errors
                 if(n==-1){
                     perror("file read fail");
                     return EXIT_FAILURE;
                 }
+                // print what's in the buffer each time
+                //printf("%s\n", buffer);
                 // send the buffer of data to the client server, via the local nsid socket
                 // m will hold the number of bytes sent each time
+                // won't continue till it receives something back
                 m=send(nsid,buffer,n,0);
                 if(m==-1){
                     perror("payload send error");
@@ -200,15 +203,13 @@ int main(int argc,char** argv){
                 }
                 // add to the total bytes sent
                 count+=m;
-                // print what's in the buffer for this read
-                // fprintf(stdout,"----\n%s\n----\n",buffer);
                 // zero everything in the buffer
                 bzero(buffer,BUFFER);
                 // read the next section of the file into the buffer
                 n=read(fd,buffer,BUFFER);
             }
             // read has returned 0 = end of file
-       
+
             // unlock the client by sending 0 bytes, signifying end of file
             send(nsid,buffer,0,0);
             
@@ -236,7 +237,7 @@ int main(int argc,char** argv){
         close(nsid);
 
 		// print the connection number, connection ip and port, file retrieved, file size and status, IP address and port number of client
-		printf("Connection: \"%d\", from Client: \"%s:%d\", file: \"%s\", size: \"%lld\", status: \"%s\"\n",conn_count,clt_ip,clt_port,rtn_string,sz,status);
+		printf("Connection: \"%d\", client: \"%s:%d\", file: \"%s\", size: \"%lld\", status: \"%s\"\n",conn_count,clt_ip,clt_port,filename,sz,status);
 
 		// reset the data counter and connection loop counter
 		conn_count++;
@@ -245,7 +246,7 @@ int main(int argc,char** argv){
         // reset the file size
         sz = 0;
         
-		// sleep for 1 second to make sure the server is ready to receive the next connections
+		// sleep for 1 second to make sure the server is ready to receive the next connection
 		sleep(1);
 
     }

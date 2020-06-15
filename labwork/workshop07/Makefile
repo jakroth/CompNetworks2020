@@ -15,18 +15,18 @@ CC = gcc
 CFLAGS = -Wall
 
 # variables for the .c files. 
-C_TCPCLT = tcpclient.c
-C_TCPSRV = tcpserver.c
-C_UDPCLT = udpclient.c
-C_UDPSRV = udpserver.c
-C_TSTCLT = testclient.c
+C_TCPCLT = client/tcpclient.c
+C_TCPSRV = server/tcpserver.c
+C_UDPCLT = client/udpclient.c
+C_UDPSRV = server/udpserver.c
+C_TSTCLT = client/testclient.c
 
 # variables for the a.out files. 
-A_TCPCLT = tcpclient
-A_TCPSRV = tcpserver
-A_UDPCLT = udpclient
-A_UDPSRV = udpserver
-A_TSTCLT = testclient
+A_TCPCLT = client/tcpclient
+A_TCPSRV = server/tcpserver
+A_UDPCLT = client/udpclient
+A_UDPSRV = server/udpserver
+A_TSTCLT = client/testclient
 
 all: ${A_TCPCLT} ${A_TCPSRV} ${A_UDPCLT} ${A_UDPSRV} ${A_TSTCLT}
 
@@ -54,12 +54,12 @@ ${A_TSTCLT}: ${C_TSTCLT}
 
 # remove all binaries, ~files and clt transmitted data files
 clean:
-	-rm -fv ${OFILES} ${A_TCPCLT} ${A_TCPSRV} ${A_UDPCLT} ${A_UDPSRV} ${A_TSTCLT} *~ clt.*
+	-rm -fv ${OFILES} ${A_TCPCLT} ${A_TCPSRV} ${A_UDPCLT} ${A_UDPSRV} ${A_TSTCLT} *~ clt.* client/*~ server/*~ server/clt.* client/test*.txt test*.txt
                  
 proper: clean all
 
-#these commands are not the names of files, they are just commands 
-#so .PHONY means the makefile will always run them, won't check to see if there's a file that needs to be updated
+# these commands are not the names of files, they are just commands 
+# so .PHONY means the makefile will always run them, won't check to see if there's a file that needs to be updated
 .PHONY: all clean proper tcp udp test
 
 # fin du Makefile (left in some French :))

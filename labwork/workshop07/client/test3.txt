@@ -11,6 +11,7 @@
 <li>Titles</li>
 <li>Formatting; <i>like this</i>
 </ul>
+<p>This line is to make the file bigger than the 512 buffer size</p>
 <hr>
 <p>Here is an image</p>
 <p><img src="http://ww.notarealimage.com/image.png" alt="Not a real image"></p>

@@ -1,0 +1,23 @@
+<html>
+<!-- This is a simple html page -->
+<head>
+<title>TCP test webpage</title>
+</head>
+<body>
+<h1>TCP Test Page</h1>
+<p>Some <b>example</b> code for testing my TCP server. Includes: </p>
+<ul>
+<li>Headers</li>
+<li>Titles</li>
+<li>Formatting; <i>like this</i>
+</ul>
+<p>This line is to make the file bigger than the 512 buffer size</p>
+<hr>
+<p>Here is an image</p>
+<p><img src="http://ww.notarealimage.com/image.png" alt="Not a real image"></p>
+<p><a href="https://www.notarealwebsite.com/">A broken link</a></p>
+<hr>
+<p>Copyright Joel Pillar-Rogers</p>
+<p>/p>
+</body>
+</html>
